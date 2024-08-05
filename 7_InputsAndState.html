@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- JSX를 위한 스크립트추가 -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+   <script type="text/babel">
+
+    function App(){
+    
+   
+    const root= document.getElementById("root");
+
+    const [minutes,setMinutes] = React.useState();
+    const onChange =(event)=>{
+        //console.log(event.target.value);
+        setMinutes((current)=>current=event.target.value);
+    }
+    
+    return (
+        <div>
+           <h1>Super Converter</h1>
+           <label htmlFor="minutes">Minutes</label>
+           <input 
+           value={minutes} 
+           id="minutes" 
+           placeholder="Minutes" 
+           type ="number"
+           onChange={onChange}
+           />
+           <label htmlFor="hours">Hours</label>
+           <input id="hours"placeholder="Hours" type="number"/>
+        </div>
+    );
+    }
+   
+
+     ReactDOM.render(<App/>,root);
+    </script>
+
+</html>

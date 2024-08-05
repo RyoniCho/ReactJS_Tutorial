@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- JSX를 위한 스크립트추가 -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+   <script type="text/babel">
+    
+      //JSX: Javascript를 확장한 문법
+      //HTML에서 사용한 문법과 비슷한 JSX문법을 이용해서 React.createElement를 대체해본다.
+
+      const root= document.getElementById("root");
+
+      //New Way to create react Element (using JSX)
+      //Babel이 이 스크립트를 React.createElement로 변환해준다. 
+      const Title = ()=> (<h3 id="title" onMouseEnter={()=>{console.log("mouse entererd")}}>Hello i am Title</h3>);
+      const Button =()=>(<button onClick={()=>{console.log("clicked");}}>Click me</button>);
+      
+      //Old Way to create react Element
+      /*
+      const h3=React.createElement("h3",{
+        onMouseEnter: ()=> {console.log("mouse enter");}
+      },"Hello i am span");
+
+      const btn = React.createElement("button",{
+        onClick: ()=>
+        { 
+            console.log("Clicked");
+        }
+      },"Click Me");
+      */
+      
+      //const container =React.createElement("div",null,[h3,btn]);
+      
+      //이렇게 h3와 btn을 쓰기위해서는 h3와 btn이 함수여야한다. 
+      //그렇기때문에 const h3 = (<h3>hello</h3>); 를 무명메소드로 바꿔준다.
+      //const h3 = ()=> (<h3>hello</h3>);
+      //다음 메소드는 다음과 같다
+      //function h3(){
+      //  return (<h3>hello</h3>);
+      //}
+      //그리고 잊어서는 안될것. 함수명은 무조건 대문자로 시작해준다. 소문자일경우
+      //JSX가 html태그로 인식하기때문이다. 
+      /*
+      const container=(
+       <div>
+        h3
+        btn
+        </div>);
+
+      */
+     const Container =()=> (
+        <div>
+          <Title/>
+          <Button/>
+          </div>
+     );
+      ReactDOM.render(<Container/>,root);
+    </script>
+
+</html>

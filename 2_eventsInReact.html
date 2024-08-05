@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script>
+    
+      const root= document.getElementById("root");
+
+      //const span=React.createElement("span",{id:"sexy-span",style:{color:"red"}},"hello i am span");
+      const span=React.createElement("h3",{
+        onMouseEnter: ()=> {console.log("mouse enter");}
+      },"Hello i am span");
+      
+      const btn = React.createElement("button",{
+        onClick: ()=>
+        { 
+            console.log("Clicked");
+        }
+      },"Click Me");
+      const container =React.createElement("div",null,[span,btn]);
+      ReactDOM.render(container,root);
+    </script>
+
+</html>

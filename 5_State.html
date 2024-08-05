@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="root"></div>
+    </body>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- JSX를 위한 스크립트추가 -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+   <script type="text/babel">
+    
+     
+      const root= document.getElementById("root");
+
+    let counter = 0;
+    function CountUp()
+    {
+        counter = counter +1;
+        //값을 바꿀때마다 Render를 다시해줘야한다. 
+        //이 부분을 놓치기쉽다. 따라서 다음 파트에서 이것을 다르게 사용할수있는방법이나온다.
+        Render();
+    }
+
+     
+     const Container =()=> (
+        <div>
+            <h3>Total Clicks: {counter}</h3>
+            <button onClick={CountUp}>Click Me</button>
+        </div>
+     );
+     function Render()
+     {
+        ReactDOM.render(<Container/>,root);
+     }
+
+     Render();
+    </script>
+
+</html>
