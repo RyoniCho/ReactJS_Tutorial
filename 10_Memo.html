@@ -1,0 +1,66 @@
+<html>
+    <head></head>
+    <body>
+        
+        <div id ="root">
+        </div>
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+        <!-- JSX를 위한 스크립트추가 -->
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    </body>
+
+      <!--JSX사용을 위해script type으로 babel 설정 -->
+    <script type="text/babel">
+       
+        const root = document.querySelector("#root");
+        function Render()
+        {
+            // ReactDOM.render(element,domComtainer)
+            ReactDOM.render(<App/>,root);    
+        }
+
+        //React Function에는 유일하게 Argument가 하나 들어갈수있다.
+        //이는 객체로 html에서 넣는것처럼 해당객체에 변수를 넣을수있다. 
+        function Button(props)
+        {
+            console.log(props.text + "is rendered");
+
+            return (
+                <button onClick={props.onClick}>{props.text}</button>
+            )
+        }
+
+
+        //App, 즉 부모 state가 업데이트되면 자식 Component들도 모두 다시 rendering된다.
+        //이 경우 props가 변경되는 경우에만 rerender되게 하는것이 memo이다.
+        //memo를 사용해서 넣으면 props가 바뀐 컴포넌트만 렌더를 다시하게된다. 
+        //최적화를 위해 알아두어야할내용.
+
+        const ButtonMemo = React.memo(Button)
+        function App(){
+            
+            const[text,setText] = React.useState("Button1")
+            const ClickTest = ()=>(setText("Clicked"))
+
+            return(
+                
+                <div>
+                    
+                    <h1>Props Test</h1>
+                    <ButtonMemo text = {text} onClick={ClickTest}/>
+                    <ButtonMemo text = "Button2"/>
+                    
+                    
+                </div>
+            );
+
+        }
+
+        Render();
+        
+    </script>
+   
+</html>

@@ -1,0 +1,55 @@
+<html>
+    <head></head>
+    <body>
+        
+        <div id ="root">
+        </div>
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+        <!-- JSX를 위한 스크립트추가 -->
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    </body>
+
+      <!--JSX사용을 위해script type으로 babel 설정 -->
+    <script type="text/babel">
+       
+        const root = document.querySelector("#root");
+        function Render()
+        {
+            // ReactDOM.render(element,domComtainer)
+            ReactDOM.render(<App/>,root);    
+        }
+
+        //React Function에는 유일하게 Argument가 하나 들어갈수있다.
+        //이는 객체로 html에서 넣는것처럼 해당객체에 변수를 넣을수있다. 
+        function Button(props)
+        {
+            return (
+                <button>{props.text}</button>
+            )
+        }
+
+
+        function App(){
+            
+            return(
+                
+                <div>
+                    
+                    <h1>Props Test</h1>
+                    <Button text = "Button1"/>
+                    <Button text = "Button2"/>
+                    
+                    
+                </div>
+            );
+
+        }
+
+        Render();
+        
+    </script>
+   
+</html>

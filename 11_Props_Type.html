@@ -1,0 +1,77 @@
+<html>
+    <head></head>
+    <body>
+        
+        <div id ="root">
+        </div>
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+
+        <!-- JSX를 위한 스크립트추가 -->
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <!-- Prop type 사용을 위한 스크립트추가 -->
+        <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
+
+    </body>
+
+      <!--JSX사용을 위해script type으로 babel 설정 -->
+    <script type="text/babel">
+       
+        const root = document.querySelector("#root");
+        function Render()
+        {
+            // ReactDOM.render(element,domComtainer)
+            ReactDOM.render(<App/>,root);    
+        }
+
+        //React Function에는 유일하게 Argument가 하나 들어갈수있다.
+        //이는 객체로 html에서 넣는것처럼 해당객체에 변수를 넣을수있다. 
+        function Button(props)
+        {
+            console.log(props.text + "is rendered");
+
+            return (
+                <button onClick={props.onClick}>{props.text}</button>
+            )
+        }
+
+        //props는 object이기때문에 아무타입이나 넣을수있다.
+        //그렇기때문에 잘못된 타입을 넣어도 에러를 잡아낼수없음.
+        //타입지정을 통해 최소한 에러코드라도 나오게 할수있는 방법이 prop type사용이다.
+
+        Button.propTypes ={
+            text: PropTypes.string.isRequired,
+            onClick: PropTypes.func
+
+        }
+
+        //밑에 Button2는 onclick에 스트링을 넣어서 다음과 같은 warning이 발생한다.
+        //react-dom.development.js:61 Warning: Failed prop type: Invalid prop `onClick` of type `string` supplied to `Button`, expected `function`.
+
+
+        const ButtonMemo = React.memo(Button)
+        function App(){
+            
+            const[text,setText] = React.useState("Button1")
+            const ClickTest = ()=>(setText("Clicked"))
+
+            return(
+                
+                <div>
+                    
+                    <h1>Props Test</h1>
+                    <ButtonMemo text = {text} onClick={ClickTest}/>
+                    
+                    <ButtonMemo text = "Button2" onClick="ddd"/>
+                    
+                    
+                </div>
+            );
+
+        }
+
+        Render();
+        
+    </script>
+   
+</html>
