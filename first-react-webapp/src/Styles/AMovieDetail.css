@@ -1,0 +1,125 @@
+/* 
+.movie-detail {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.movie-detail h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+.movie-detail img {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.movie-detail video {
+    width: 100%;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.movie-detail p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #34495e;
+    margin-bottom: 20px;
+}
+
+.movie-detail .delete-button {
+    display: block;
+    width: 100%;
+    background-color: #e74c3c;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.movie-detail .delete-button:hover {
+    background-color: #c0392b;
+} */
+.movie-detail {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.movie-detail h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.movie-detail-main-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.movie-detail-content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.movie-detail-trailer {
+    flex: 1;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.movie-detail-info {
+    flex: 1;
+}
+
+.movie-detail-info p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 20px;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .movie-detail-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .movie-detail-trailer {
+        max-width: 100%;
+    }
+}

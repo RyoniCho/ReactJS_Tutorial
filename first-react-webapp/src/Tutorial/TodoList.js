@@ -27,7 +27,7 @@ function TodoList()
                 placeholder="Type Something to do"
                 onChange={OnInputChage}
                 />
-                <button>Add ToDo</button>
+                <button >Add ToDo</button>
 
             </form>
             <hr/>

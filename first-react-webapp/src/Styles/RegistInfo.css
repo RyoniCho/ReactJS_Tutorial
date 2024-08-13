@@ -1,0 +1,66 @@
+.movie-form {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.movie-form h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.movie-form form {
+    display: flex;
+    flex-direction: column;
+}
+
+.movie-form label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.movie-form input[type="text"],
+.movie-form input[type="file"],
+.movie-form textarea {
+    margin-bottom: 20px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.movie-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.movie-form button {
+    padding: 12px 20px;
+    background-color: #5cb85c;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.movie-form button:hover {
+    background-color: #4cae4c;
+}
+
+.error-popup {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}

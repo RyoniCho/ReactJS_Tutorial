@@ -1,30 +1,32 @@
-import Button from "./Button";
-import styles from "./App.module.css"
-import { useState } from "react";
-import TodoList from "./TodoList"
-import CoinTracker from "./CoinTracker";
-import MovieList from "./MovieList";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
+import RegistInfo from "./RegistInfo";
+import AMovieList from './AMovieList';
+import AMovieDetail from "./AMoiveDetail";
+import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
+import './Styles/App.css';
 
 function App() {
 
  
 
   return (
-    <div>
-      {/* <TodoList/> */}
-      {/* <CoinTracker/> */}
-      <Router>
-      <div>
-        <h1>Movie App</h1>
-        <Routes>
-        
-          <Route path="/" element={<MovieList/>} />
-         
-        </Routes>
-      </div>
-    </Router>
-    </div>
+   
+    <Router>
+            <div className="app">
+                <h1>Movie App</h1>
+                <nav>
+                    <Link to="/">Home</Link>
+                    <Link to="/add">Add Movie</Link>
+                </nav>
+               
+                
+                <Routes>
+                    <Route path="/" element={<AMovieList/>} />
+                    <Route path="/movies/:id" element={<AMovieDetail/>} />
+                    <Route path="/add" element={<RegistInfo/>} />
+                </Routes>
+            </div>
+        </Router>
   )
 
 }
