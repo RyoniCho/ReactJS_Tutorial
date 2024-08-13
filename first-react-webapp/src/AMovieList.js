@@ -38,29 +38,7 @@ const AMovieList = () => {
     };
 
     return (
-    //     <div className="movie-list-container">
-    //     <div className="search-bar">
-    //         <input
-    //             type="text"
-    //             placeholder="Search by title..."
-    //             value={searchTerm}
-    //             onChange={handleSearch}
-    //         />
-    //     </div>
-    //     <div className="movie-list">
-    //         {movies.map(movie => (
-    //             <div key={movie._id} className="movie-item">
-    //                 <Link to={`/movies/${movie._id}`}>
-    //                     <img src={`http://localhost:3001/${movie.image}`} alt={movie.title} />
-    //                     <h3>{movie.title}</h3>
-    //                 </Link>
-    //                 <button onClick={() => deleteMovie(movie._id)} className="delete-button">
-    //                     Delete
-    //                 </button>
-    //             </div>
-    //         ))}
-    //     </div>
-    // </div>
+    
     <div className="movie-list">
             <input
                 type="text"
