@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
+import Config from './Config'
 
 const AMovieList = () => {
     const [movies, setMovies] = useState([]);
@@ -13,7 +14,7 @@ const AMovieList = () => {
     const fetchMovies = async (query = '') => {
         try {
             console.log("fetch movies");
-            const response = await fetch(`http://localhost:3001/api/movies?serialNumber=${query}`);
+            const response = await fetch(`${Config.apiUrl}/api/movies?serialNumber=${query}`);
             const data = await response.json();
             setMovies(data);
         } catch (error) {
@@ -23,7 +24,7 @@ const AMovieList = () => {
 
     const deleteMovie = async (id) => {
         try {
-            await fetch(`http://localhost:3001/api/movies/${id}`, {
+            await fetch(`${Config.apiUrl}/api/movies/${id}`, {
                 method: 'DELETE',
             });
             fetchMovies(); // 삭제 후 목록 갱신
@@ -51,7 +52,7 @@ const AMovieList = () => {
                 {movies.map((movie) => (
                     <div key={movie._id} className="movie-card">
                         <Link to={`/movies/${movie._id}`} className="movie-link">
-                            <img src={`http://localhost:3001/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
+                            <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
                                 <p>Serial: {movie.serialNumber}</p>

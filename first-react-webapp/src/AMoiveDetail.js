@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams,useNavigate } from 'react-router-dom';
-import './Styles/AMovieDetail.css';
+import './Styles/AMovieDetail.css'
+import Config from './Config'
 
 const AMovieDetail = () => {
     const { id } = useParams();
@@ -10,7 +11,10 @@ const AMovieDetail = () => {
     useEffect(() => {
         const fetchMovie = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/api/movies/${id}`);
+                const url = `${Config.apiUrl}/api/movies/${id}`;
+                console.log(url)
+                const response = await fetch(url);
+                console.log("AmovieDetail Response:"+response)
                 const data = await response.json();
                 setMovie(data);
             } catch (error) {
@@ -23,7 +27,7 @@ const AMovieDetail = () => {
 
     const deleteMovie = async () => {
         try {
-            await fetch(`http://localhost:3001/api/movies/${id}`, {
+            await fetch(`${Config.apiUrl}/api/movies/${id}`, {
                 method: 'DELETE',
             });
             navigate('/'); // 삭제 후 메인 페이지로 이동
@@ -37,10 +41,10 @@ const AMovieDetail = () => {
     return (
         <div className="movie-detail">
             <h2>{movie.title}</h2>
-            <img src={`http://localhost:3001/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
+            <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
-                    <source src={`http://localhost:3001/${movie.trailer}`} type="video/mp4" />
+                    <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
                 <div className="movie-detail-info">

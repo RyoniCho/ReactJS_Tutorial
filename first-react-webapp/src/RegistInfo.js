@@ -1,6 +1,7 @@
 import {  useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import './Styles/RegistInfo.css';
+import Config from './Config'
 
 function RegistInfo()
 {
@@ -25,7 +26,7 @@ function RegistInfo()
 
     const fetchActors = async () => {
         try {
-            const response = await fetch('http://localhost:3001/api/actors');
+            const response = await fetch(`${Config.apiUrl}/api/actors`);
             const data = await response.json();
             setActors(data);
         } catch (error) {
@@ -36,7 +37,7 @@ function RegistInfo()
     const handleAddActor = async () => {
         if (newActor) {
             try {
-                const response = await fetch('http://localhost:3001/api/actors', {
+                const response = await fetch(`${Config.apiUrl}/api/actors`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: newActor }),
@@ -53,7 +54,7 @@ function RegistInfo()
 
     const checkSerialNumberExists = async (serialNumber) => {
         try {
-            const response = await fetch(`http://localhost:3001/api/movies?serialNumber=${serialNumber}`);
+            const response = await fetch(`${Config.apiUrl}/api/movies?serialNumber=${serialNumber}`);
             const data = await response.json();
             return data.length > 0; 
         } catch (error) {
@@ -80,7 +81,7 @@ function RegistInfo()
         formData.append('trailer', trailer);
         formData.append('description', description);
     
-        await fetch('http://localhost:3001/api/movies', {
+        await fetch(`${Config.apiUrl}/api/movies`, {
           method: 'POST',
           body: formData,
         });
