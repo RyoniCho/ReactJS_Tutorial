@@ -11,6 +11,7 @@ function RegistInfo()
     const [trailer, setTrailer] = useState(null);
     const [plexRegistered, setPlexRegistered] = useState(false);
     const [description, setDescription] = useState('');
+    const [releaseDate,setReleaseDate] = useState(Date.now);
 
     //Actors
     const [actors, setActors] = useState([]);
@@ -80,6 +81,7 @@ function RegistInfo()
         formData.append('image', image);
         formData.append('trailer', trailer);
         formData.append('description', description);
+        formData.append('releaseDate', releaseDate);
     
         await fetch(`${Config.apiUrl}/api/movies`, {
           method: 'POST',
@@ -172,9 +174,21 @@ function RegistInfo()
                         required
                     />
                 </div>
+                <div>
+                    <label>Release Date:</label>
+                    <input
+                        type="date"
+                        onChange={(e) => setReleaseDate(e.target.value)}
+                        required
+                    />
+                </div>
+                <br></br>
+                <div>
+                 <button type="submit">Add Info</button>
+                </div>
                 
 
-                <button type="submit">Add Info</button>
+              
             </form>
         </div>
         

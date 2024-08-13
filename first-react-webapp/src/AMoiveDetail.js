@@ -27,14 +27,24 @@ const AMovieDetail = () => {
 
     const deleteMovie = async () => {
         try {
-            await fetch(`${Config.apiUrl}/api/movies/${id}`, {
-                method: 'DELETE',
-            });
-            navigate('/'); // 삭제 후 메인 페이지로 이동
+            const isConfirmed = window.confirm('Are you sure you want to delete?');
+            if(isConfirmed)
+            {
+                await fetch(`${Config.apiUrl}/api/movies/${id}`, {
+                    method: 'DELETE',
+                });
+                navigate('/'); // 삭제 후 메인 페이지로 이동
+            }
+           
         } catch (error) {
             console.error('Error deleting movie:', error);
         }
     };
+    
+    const GetReleaseDataStr=(d)=>{
+        const date = new Date(d);
+        return `${date.getFullYear().toString().substr(-2)}년 ${date.getMonth()+1}월`
+    }
 
     if (!movie) return <div>Loading...</div>;
 
@@ -49,9 +59,10 @@ const AMovieDetail = () => {
                 </video>
                 <div className="movie-detail-info">
                     <p><strong>Serial Number:</strong> {movie.serialNumber}</p>
-                    <p><strong>Actor:</strong> {movie.actors}</p>
+                    <p><strong>Actor:</strong> {movie.actor}</p>
                     <p><strong>Plex Registered:</strong> {movie.plexRegistered ? 'Yes' : 'No'}</p>
                     <p><strong>Description:</strong> {movie.description}</p>
+                    <p><strong>Release Date:</strong> {GetReleaseDataStr(movie.releaseDate)}</p>
                     <button onClick={deleteMovie} className="delete-button">Delete Movie</button>
                 </div>
             </div>

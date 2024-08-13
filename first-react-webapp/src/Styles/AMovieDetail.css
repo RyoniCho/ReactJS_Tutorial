@@ -68,9 +68,10 @@
 .movie-detail-main-image {
     width: 100%;
     max-height: 500px;
-    object-fit: cover;
+    object-fit: contain; /* 이미지가 잘리지 않도록 함 */
     border-radius: 8px;
     margin-bottom: 20px;
+    background-color: #000; /* 이미지 주위에 여백이 생길 때 배경색이 검정으로 보이도록 함 */
 }
 
 .movie-detail-content {

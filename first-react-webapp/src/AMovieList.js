@@ -24,10 +24,17 @@ const AMovieList = () => {
 
     const deleteMovie = async (id) => {
         try {
-            await fetch(`${Config.apiUrl}/api/movies/${id}`, {
-                method: 'DELETE',
-            });
-            fetchMovies(); // 삭제 후 목록 갱신
+
+            const isConfirmed = window.confirm('Are you sure you want to delete?');
+            if(isConfirmed)
+            {
+                await fetch(`${Config.apiUrl}/api/movies/${id}`, {
+                    method: 'DELETE',
+                });
+                fetchMovies(); // 삭제 후 목록 갱신
+            }
+
+           
         } catch (error) {
             console.error('Error deleting movie:', error);
         }
@@ -37,6 +44,11 @@ const AMovieList = () => {
         setSearchTerm(e.target.value);
         fetchMovies(e.target.value); // 검색어가 입력될 때마다 fetchMovies 호출
     };
+
+    const GetReleaseDataStr=(d)=>{
+        const date = new Date(d);
+        return `${date.getFullYear().toString().substr(-2)}년 ${date.getMonth()+1}월`
+    }
 
     return (
     
@@ -52,10 +64,17 @@ const AMovieList = () => {
                 {movies.map((movie) => (
                     <div key={movie._id} className="movie-card">
                         <Link to={`/movies/${movie._id}`} className="movie-link">
+                        <div className="movie-info">
+                            <p>{movie.serialNumber}</p>
+                        </div>
                             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
-                                <p>Serial: {movie.serialNumber}</p>
+                                <h4>보유여부: {movie.plexRegistered ? 'O' : 'X'}</h4>
+                                <div className='release-date'>
+                                    <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
+                                </div>
+                              
                             </div>
                         </Link>
                         <button onClick={() => deleteMovie(movie._id)} className="delete-button">
