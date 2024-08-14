@@ -39,9 +39,16 @@ function RegistInfo()
     const handleAddActor = async () => {
         if (newActor) {
             try {
+                const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                    },
+                };
+                
                 const response = await axios.post(`${Config.apiUrl}/api/actors`, {
                     name: newActor,
-                });
+                },config);
                 const actor = response.data;
                 setActors([...actors, actor]); // 배우 목록에 추가
                 setSelectedActor(actor.name); // 추가한 배우를 선택
