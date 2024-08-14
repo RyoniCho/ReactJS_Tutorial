@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams,useNavigate } from 'react-router-dom';
 import './Styles/AMovieDetail.css'
 import Config from './Config'
+import axios from 'axios';
 
-const AMovieDetail = () => {
+const AMovieDetail = ({isAuthenticated}) => {
     const { id } = useParams();
     const [movie, setMovie] = useState(null);
     const navigate = useNavigate();
@@ -30,15 +31,24 @@ const AMovieDetail = () => {
             const isConfirmed = window.confirm('Are you sure you want to delete?');
             if(isConfirmed)
             {
-                await fetch(`${Config.apiUrl}/api/movies/${id}`, {
-                    method: 'DELETE',
-                });
+                const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                    },
+                };
+
+                await axios.delete(`${Config.apiUrl}/api/movies/${id}`, config);
                 navigate('/'); // 삭제 후 메인 페이지로 이동
             }
            
         } catch (error) {
             console.error('Error deleting movie:', error);
         }
+    };
+
+    const handleEdit = () => {
+        navigate(`/edit/${movie._id}`);
     };
     
     const GetReleaseDataStr=(d)=>{
@@ -63,7 +73,19 @@ const AMovieDetail = () => {
                     <p><strong>Plex Registered:</strong> {movie.plexRegistered ? 'Yes' : 'No'}</p>
                     <p><strong>Description:</strong> {movie.description}</p>
                     <p><strong>Release Date:</strong> {GetReleaseDataStr(movie.releaseDate)}</p>
-                    <button onClick={deleteMovie} className="delete-button">Delete Movie</button>
+                   
+                   {
+                    isAuthenticated ? (
+
+                        <div className='button-container'>
+                         {/* 편집 버튼 */}
+                        <button className="edit-button" onClick={handleEdit}>Edit</button> 
+                        <button className="delete-button" onClick={deleteMovie}>Delete</button>
+                    </div>
+                    ): (<></>)
+                   }
+                    
+                    
                 </div>
             </div>
         </div>

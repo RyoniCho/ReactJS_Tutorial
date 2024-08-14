@@ -1,56 +1,4 @@
-/* 
-.movie-detail {
-    max-width: 800px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
 
-.movie-detail h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-size: 28px;
-}
-
-.movie-detail img {
-    width: 100%;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-.movie-detail video {
-    width: 100%;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-.movie-detail p {
-    font-size: 18px;
-    line-height: 1.6;
-    color: #34495e;
-    margin-bottom: 20px;
-}
-
-.movie-detail .delete-button {
-    display: block;
-    width: 100%;
-    background-color: #e74c3c;
-    color: white;
-    padding: 15px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: center;
-    font-size: 18px;
-    transition: background-color 0.3s ease;
-}
-
-.movie-detail .delete-button:hover {
-    background-color: #c0392b;
-} */
 .movie-detail {
     max-width: 1000px;
     margin: 0 auto;
@@ -97,7 +45,7 @@
     margin: 10px 0;
     font-size: 16px;
 }
-
+/*
 .delete-button {
     background-color: #e74c3c;
     color: white;
@@ -107,6 +55,58 @@
     cursor: pointer;
     transition: background-color 0.2s;
     margin-top: 20px;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}
+
+.edit-button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover {
+    background-color: #2980b9;
+}
+*/
+.button-container {
+    display: flex;
+    flex-direction: row;  /* 버튼들을 가로로 배치 */
+    gap: 10px;  /* 버튼들 사이의 간격 */
+    width: 100%;  /* 컨테이너가 전체 너비를 차지하도록 설정 */
+    align-items: center;
+   
+    
+}
+
+.edit-button,
+.delete-button {
+    background-color: #3498db;  /* 기본 버튼 색상 */
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    flex-grow: 1; /* 동일한 너비를 갖도록 설정 */
+    text-align: centers;
+    transition: background-color 0.3s ease;
+    height: 100%;
+    margin-top: 10px;
+}
+
+.delete-button {
+    background-color: #e74c3c;  /* 삭제 버튼의 색상 */
+}
+
+.edit-button:hover {
+    background-color: #2980b9;
 }
 
 .delete-button:hover {

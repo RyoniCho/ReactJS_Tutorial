@@ -1,6 +1,6 @@
 
 const Config = {
-    apiUrl: 'API_URL_HERE',
+    apiUrl: 'http://localhost:3001',
 };
 
 export default Config;

@@ -2,6 +2,7 @@ import {  useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import './Styles/RegistInfo.css';
 import Config from './Config'
+import axios from 'axios';
 
 function RegistInfo()
 {
@@ -38,12 +39,10 @@ function RegistInfo()
     const handleAddActor = async () => {
         if (newActor) {
             try {
-                const response = await fetch(`${Config.apiUrl}/api/actors`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: newActor }),
+                const response = await axios.post(`${Config.apiUrl}/api/actors`, {
+                    name: newActor,
                 });
-                const actor = await response.json();
+                const actor = response.data;
                 setActors([...actors, actor]); // 배우 목록에 추가
                 setSelectedActor(actor.name); // 추가한 배우를 선택
                 setNewActor(''); // 입력 필드를 초기화
@@ -82,11 +81,18 @@ function RegistInfo()
         formData.append('trailer', trailer);
         formData.append('description', description);
         formData.append('releaseDate', releaseDate);
-    
-        await fetch(`${Config.apiUrl}/api/movies`, {
-          method: 'POST',
-          body: formData,
-        });
+
+
+
+        const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+        const config = {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+            },
+        };
+
+        const response = await axios.post(`${Config.apiUrl}/api/movies`, formData, config);
     
         // 성공적으로 제출한 후 폼을 초기화
         setTitle('');

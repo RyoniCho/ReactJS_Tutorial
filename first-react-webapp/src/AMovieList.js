@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Config from './Config'
+import axios from 'axios';
 
-const AMovieList = () => {
+const AMovieList = ({isAuthenticated}) => {
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -28,9 +29,15 @@ const AMovieList = () => {
             const isConfirmed = window.confirm('Are you sure you want to delete?');
             if(isConfirmed)
             {
-                await fetch(`${Config.apiUrl}/api/movies/${id}`, {
-                    method: 'DELETE',
-                });
+                const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                    },
+                };
+
+                await axios.delete(`${Config.apiUrl}/api/movies/${id}`, config);
+
                 fetchMovies(); // 삭제 후 목록 갱신
             }
 
@@ -77,9 +84,9 @@ const AMovieList = () => {
                               
                             </div>
                         </Link>
-                        <button onClick={() => deleteMovie(movie._id)} className="delete-button">
-                            Delete
-                        </button>
+                        {
+                            isAuthenticated? (<button onClick={() => deleteMovie(movie._id)} className="delete-button"> Delete</button>):(<></>)
+                        }
                     </div>
                 ))}
             </div>
