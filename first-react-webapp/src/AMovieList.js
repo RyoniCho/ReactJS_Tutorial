@@ -33,6 +33,7 @@ const AMovieList = ({isAuthenticated}) => {
                 const config = {
                     headers: {
                         'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                        withCredentials: true
                     },
                 };
 

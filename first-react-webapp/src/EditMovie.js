@@ -66,6 +66,7 @@ function EditMovie() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                withCredentials: true
             },
         };
         

@@ -43,6 +43,7 @@ function RegistInfo()
                 const config = {
                     headers: {
                         'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                         withCredentials: true
                     },
                 };
                 
@@ -96,6 +97,7 @@ function RegistInfo()
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                 withCredentials: true
             },
         };
 
