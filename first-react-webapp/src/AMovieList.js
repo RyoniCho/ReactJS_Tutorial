@@ -130,7 +130,7 @@ const AMovieList = ({isAuthenticated}) => {
                             </div>
                         </Link>
                         {
-                            isAuthenticated? (<button onClick={() => deleteMovie(movie._id)} className="delete-button"> Delete</button>):(<></>)
+                            isAuthenticated? (<button onClick={() => deleteMovie(movie._id)} className="list-delete-button"> Delete</button>):(<></>)
                         }
                     </div>
                 ))}

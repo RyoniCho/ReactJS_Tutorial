@@ -74,7 +74,7 @@
         color: skyblue;
     }
     
-    .delete-button {
+    .list-delete-button {
         background-color: #e74c3c;
         color: white;
         padding: 10px;
@@ -86,7 +86,7 @@
         margin-top: 10px;
     }
     
-    .delete-button:hover {
+    .list-delete-button:hover {
         background-color: #c0392b;
     }
 
