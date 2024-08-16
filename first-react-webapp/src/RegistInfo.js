@@ -13,6 +13,8 @@ function RegistInfo()
     const [plexRegistered, setPlexRegistered] = useState(false);
     const [description, setDescription] = useState('');
     const [releaseDate,setReleaseDate] = useState(Date.now);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     //Actors
     const [actors, setActors] = useState([]);
@@ -80,6 +82,7 @@ function RegistInfo()
             return;
         }
 
+
         const formData = new FormData();
         formData.append('title', title);
         formData.append('serialNumber', serialNumber);
@@ -90,7 +93,8 @@ function RegistInfo()
         formData.append('description', description);
         formData.append('releaseDate', releaseDate);
 
-
+        setIsUploading(true);
+        setUploadProgress(0);
 
         const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
         const config = {
@@ -99,16 +103,29 @@ function RegistInfo()
                 'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
                  withCredentials: true
             },
+            onUploadProgress : (progressEvent)=>{
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                setUploadProgress(percentCompleted);
+            }
         };
+        try{
+            const response = await axios.post(`${Config.apiUrl}/api/movies`, formData, config);
+            // 성공적으로 제출한 후 폼을 초기화
+            setTitle('');
+            setImage(null);
+            setTrailer(null);
 
-        const response = await axios.post(`${Config.apiUrl}/api/movies`, formData, config);
-    
-        // 성공적으로 제출한 후 폼을 초기화
-        setTitle('');
-        setImage(null);
-        setTrailer(null);
-
-        navigate('/'); // 메인 페이지로 이동
+            navigate('/'); // 메인 페이지로 이동
+        }
+        catch(error)
+        {
+            console.error('Upload failed:', error);
+        }
+        finally
+        {
+            setIsUploading(false);
+        }
+       
       };
 
     return (
@@ -199,8 +216,16 @@ function RegistInfo()
                 </div>
                 <br></br>
                 <div>
-                 <button type="submit">Add Info</button>
+                 <button type="submit" disabled={isUploading}>{isUploading ? 'Uploading...' : 'Add Movie'}</button>
                 </div>
+                {isUploading && (
+                <div className="progress-bar">
+                    <div
+                        className="progress-bar-fill"
+                        style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                </div>
+)}
                 
 
               
