@@ -1,0 +1,16 @@
+.option-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #f0f0f0;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.option-bar select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 14px;
+}

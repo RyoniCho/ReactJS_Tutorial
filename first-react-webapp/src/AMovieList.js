@@ -3,13 +3,22 @@ import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Config from './Config'
 import axios from 'axios';
+import OptionBar from './OptionBar';
 
 const AMovieList = ({isAuthenticated}) => {
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [actors, setActors] = useState([]);
+    const [selectedActor, setSelectedActor] = useState('');
+    const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
+    const [owned, setOwned] = useState('all'); // 'all', 'true', 'false'
+
 
     useEffect(() => {
         fetchMovies();
+        fetchActors();
+       
+
     }, []);
 
     const fetchMovies = async (query = '') => {
@@ -20,6 +29,17 @@ const AMovieList = ({isAuthenticated}) => {
             setMovies(data);
         } catch (error) {
             console.error('Error fetching movies:', error);
+        }
+    };
+
+    const fetchActors = async () => {
+        try {
+            const response = await fetch(`${Config.apiUrl}/api/actors`);
+            const data = await response.json();
+            setActors(data);
+            console.log(actors)
+        } catch (error) {
+            console.error('Error fetching actors:', error);
         }
     };
 
@@ -58,9 +78,33 @@ const AMovieList = ({isAuthenticated}) => {
         return `${date.getFullYear().toString().substr(-2)}년 ${date.getMonth()+1}월`
     }
 
+    const filteredMovies = movies
+        .filter(movie => selectedActor ? movie.actor === selectedActor : true)
+        .filter(movie => {
+            if (owned === 'true') return movie.plexRegistered === true;
+            if (owned === 'false') return movie.plexRegistered === false;
+            return true;
+        })
+        .sort((a, b) => {
+            if (sortOrder === 'asc') {
+                return new Date(a.releaseDate) - new Date(b.releaseDate);
+            } else {
+                return new Date(b.releaseDate) - new Date(a.releaseDate);
+            }
+        });
+
     return (
-    
-    <div className="movie-list">
+    <div>    
+        <OptionBar
+            actors={actors}
+            selectedActor={selectedActor}
+            setSelectedActor={setSelectedActor}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            owned={owned}
+            setOwned={setOwned}
+         />
+        <div className="movie-list">
             <input
                 type="text"
                 value={searchTerm}
@@ -69,7 +113,7 @@ const AMovieList = ({isAuthenticated}) => {
                 className="search-input"
             />
             <div className="movies">
-                {movies.map((movie) => (
+                {filteredMovies.map((movie) => (
                     <div key={movie._id} className="movie-card">
                         <Link to={`/movies/${movie._id}`} className="movie-link">
                         <div className="movie-info">
@@ -92,6 +136,8 @@ const AMovieList = ({isAuthenticated}) => {
                 ))}
             </div>
         </div>
+    </div>
+
     );
 };
 
