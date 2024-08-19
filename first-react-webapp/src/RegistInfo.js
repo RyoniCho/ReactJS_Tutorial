@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import './Styles/RegistInfo.css';
 import Config from './Config'
 import axios from 'axios';
+import ExtraImageSlider from "./ExtraImageSlider";
 
 function RegistInfo()
 {
     const [serialNumber, setSerialNumber] = useState('');
     const [title, setTitle] = useState('');
     const [image, setImage] = useState(null);
+    const [urlImage,setUrlImage] =useState('');
     const [trailer, setTrailer] = useState(null);
     const [plexRegistered, setPlexRegistered] = useState(false);
     const [description, setDescription] = useState('');
@@ -23,6 +25,9 @@ function RegistInfo()
 
     //Category
     const [selectedCategory,setSelectedCategory]=useState('');
+
+    //Extra Images
+    const [extraImageUrls, setExtraImageUrls] = useState([]);
 
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -65,6 +70,9 @@ function RegistInfo()
         }
     };
 
+   
+
+
     const checkSerialNumberExists = async (serialNumber) => {
         try {
             const response = await fetch(`${Config.apiUrl}/api/movies?serialNumber=${serialNumber}`);
@@ -75,6 +83,28 @@ function RegistInfo()
             return false;
         }
     };
+
+    const FetchInformationsFromWeb =  ()=>{
+        if(serialNumber==='')
+        {
+            setError('it need Serial number to try to fetch image!!');
+            return;
+        }
+        const splitedSerialNumber= serialNumber.split("-");
+        const revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
+
+        const url =`https://pics.dmm.co.jp/digital/video/${revisedSerialNumber}/${revisedSerialNumber}pl.jpg`
+
+        for(let i=1; i<=10;i++)
+        {
+            let extraImgUrl=`https://pics.dmm.co.jp/digital/video/${revisedSerialNumber}/${revisedSerialNumber}jp-${i}.jpg`
+            setExtraImageUrls((currentArray) => [extraImgUrl, ...currentArray]);
+            
+        }
+        
+        setUrlImage(url);
+        
+    }
 
     const OnSubmit = async (e) => {
         e.preventDefault();
@@ -97,6 +127,7 @@ function RegistInfo()
         formData.append('description', description);
         formData.append('releaseDate', releaseDate);
         formData.append('category',(selectedCategory==="")?"Unknown":selectedCategory);
+        formData.append('urlImage',urlImage);
 
         setIsUploading(true);
         setUploadProgress(0);
@@ -157,6 +188,7 @@ function RegistInfo()
                         onChange={(e) => setSerialNumber(e.target.value)}
                         required
                     />
+                    {(selectedCategory==="AdultVideo")?(<button onClick={FetchInformationsFromWeb}>Try to Infomations from web</button>):(<></>)}
                 </div>
                 <div>
                     <label>Title:</label>
@@ -208,11 +240,19 @@ function RegistInfo()
                 </div>
                 <div>
                     <label>Image:</label>
-                    <input
-                        type="file"
-                        onChange={(e) => setImage(e.target.files[0])}
-                        required
-                    />
+                   
+                    {
+                        (urlImage!=='')?(<img class="movie-form-urlimage" src={urlImage}/>):
+                        ( 
+                        <input
+                            type="file"
+                            onChange={(e) => setImage(e.target.files[0])}
+                            required
+                        />)
+                    }
+
+                    {(extraImageUrls.length>0) ? <ExtraImageSlider images={extraImageUrls}/> : <></>}
+                    
                 </div>
                 <div>
                     <label>Trailer:</label>

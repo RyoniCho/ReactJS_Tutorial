@@ -3,6 +3,7 @@ import { useParams,useNavigate } from 'react-router-dom';
 import './Styles/AMovieDetail.css'
 import Config from './Config'
 import axios from 'axios';
+import ExtraImageSlider from './ExtraImageSlider';
 
 const AMovieDetail = ({isAuthenticated}) => {
     const { id } = useParams();
@@ -63,6 +64,7 @@ const AMovieDetail = ({isAuthenticated}) => {
         <div className="movie-detail">
             <h2>{movie.title}</h2>
             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
+            {(movie.extraImages) ? <ExtraImageSlider images={movie.extraImages}/> : <></>}
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
