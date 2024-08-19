@@ -21,6 +21,9 @@ function RegistInfo()
     const [selectedActor, setSelectedActor] = useState('');
     const [newActor, setNewActor] = useState('');
 
+    //Category
+    const [selectedCategory,setSelectedCategory]=useState('');
+
     const navigate = useNavigate();
     const [error, setError] = useState('');
 
@@ -83,6 +86,7 @@ function RegistInfo()
         }
 
 
+
         const formData = new FormData();
         formData.append('title', title);
         formData.append('serialNumber', serialNumber);
@@ -92,6 +96,7 @@ function RegistInfo()
         formData.append('trailer', trailer);
         formData.append('description', description);
         formData.append('releaseDate', releaseDate);
+        formData.append('category',(selectedCategory==="")?"Unknown":selectedCategory);
 
         setIsUploading(true);
         setUploadProgress(0);
@@ -133,6 +138,17 @@ function RegistInfo()
             <h2>Add New Movie</h2>
             <form onSubmit={OnSubmit}>
             {error && <div className="error-popup">{error}</div>}
+                <div>
+                <label>Category:</label>
+                    <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                        <option value="">Select Category</option>
+                        {Config.categories.map((cate,index) => (
+                            <option key={index} value={cate}>
+                                {cate}
+                            </option>
+                        ))}
+                    </select>
+                </div>
                 <div>
                     <label>Serial Number:</label>
                     <input

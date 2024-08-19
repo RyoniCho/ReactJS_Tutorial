@@ -17,7 +17,8 @@ function EditMovie() {
         actor: '',
         serialNumber: '',
         plexRegistered: false,
-        releaseDate: Date.now()
+        releaseDate: Date.now(),
+        category:'Unknown'
         
     });
 
@@ -86,6 +87,17 @@ function EditMovie() {
     return (
         <form onSubmit={handleSubmit}>
             <label>
+                Category
+            </label>
+                    <select name="category" value={movie.category} onChange={handleChange}>
+                        <option value="">Select Category</option>
+                        {Config.categories.map((cate,index) => (
+                            <option key={index} value={cate}>
+                                {cate}
+                            </option>
+                        ))}
+                    </select>
+            <label>
                 Title:
                 <input type="text" name="title" value={movie.title} onChange={handleChange} />
             </label>
@@ -97,7 +109,7 @@ function EditMovie() {
                 Actor:
                 {/* <input type="text" name="actor" value={movie.actor} onChange={handleChange} /> */}
             </label>
-                    <select value={movie.actor} onChange={handleChange}>
+                    <select name="actor" value={movie.actor} onChange={handleChange}>
                         <option value="">Select an actor</option>
                         {actors.map((actor) => (
                             <option key={actor._id} value={actor.name}>

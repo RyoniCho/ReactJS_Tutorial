@@ -12,6 +12,8 @@ const AMovieList = ({isAuthenticated}) => {
     const [selectedActor, setSelectedActor] = useState('');
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
     const [owned, setOwned] = useState('all'); // 'all', 'true', 'false'
+    const [selectedCategory, setSelectedCategory]= useState('');
+   
 
 
     useEffect(() => {
@@ -24,7 +26,8 @@ const AMovieList = ({isAuthenticated}) => {
     const fetchMovies = async (query = '') => {
         try {
             console.log("fetch movies");
-            const response = await fetch(`${Config.apiUrl}/api/movies?serialNumber=${query}`);
+            const url = `${Config.apiUrl}/api/movies?serialNumber=${query}`
+            const response = await fetch(url);
             const data = await response.json();
             setMovies(data);
         } catch (error) {
@@ -85,6 +88,48 @@ const AMovieList = ({isAuthenticated}) => {
             if (owned === 'false') return movie.plexRegistered === false;
             return true;
         })
+        .filter(movie=> {
+            if(selectedCategory)
+            {
+                if(selectedCategory === "all")
+                {
+                    if(movie.category === "AdultVideo")
+                    {
+                        if(isAuthenticated)
+                            return true;
+                        else
+                        {
+                            return false;
+                        }
+                        
+                    }
+                    return true;
+                }
+                    
+                else if(selectedCategory === movie.category)
+                {
+                    if(movie.category ==="AdultVideo")
+                    {
+                        if(isAuthenticated)
+                            return true;
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+            }
+            else{
+                if(movie.category==="AdultVideo" && !isAuthenticated )
+                    return false;
+
+                return true;
+            }
+
+        })
+            
         .sort((a, b) => {
             if (sortOrder === 'asc') {
                 return new Date(a.releaseDate) - new Date(b.releaseDate);
@@ -96,6 +141,7 @@ const AMovieList = ({isAuthenticated}) => {
     return (
     <div>    
         <OptionBar
+            isAuthenticated={isAuthenticated}
             actors={actors}
             selectedActor={selectedActor}
             setSelectedActor={setSelectedActor}
@@ -103,6 +149,9 @@ const AMovieList = ({isAuthenticated}) => {
             setSortOrder={setSortOrder}
             owned={owned}
             setOwned={setOwned}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+
          />
         <div className="movie-list">
             <input

@@ -1,9 +1,22 @@
 import "./Styles/OptionBar.css"
+import Config from "./Config";
+function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, sortOrder, setSortOrder, owned, setOwned, selectedCategory,setSelectedCategory }) {
 
-function OptionBar({ actors, selectedActor, setSelectedActor, sortOrder, setSortOrder, owned, setOwned }) {
+    const filteredCategories = Config.categories.filter(cate=>
+        (!isAuthenticated&&cate == "AdultVideo") ? false:true
+    )
 
     return (
         <div className="option-bar">
+            <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+                <option value="">All</option>
+                {filteredCategories.map((cate,index) => 
+                        (<option key={index} value={cate}>
+                            {cate}
+                        </option>)
+                    )}
+            </select>
+
             <select value={selectedActor} onChange={e => setSelectedActor(e.target.value)}>
                 <option value="">All Actors</option>
                 {actors.map(actor => (

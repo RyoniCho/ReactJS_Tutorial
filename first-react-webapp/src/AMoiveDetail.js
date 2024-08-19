@@ -69,6 +69,7 @@ const AMovieDetail = ({isAuthenticated}) => {
                     Your browser does not support the video tag.
                 </video>
                 <div className="movie-detail-info">
+                    <p><strong>Category:</strong> {movie.category.toUpperCase()}</p>
                     <p><strong>Serial Number:</strong> {movie.serialNumber}</p>
                     <p><strong>Actor:</strong> {movie.actor}</p>
                     <p><strong>Plex Registered:</strong> {movie.plexRegistered ? 'Yes' : 'No'}</p>
