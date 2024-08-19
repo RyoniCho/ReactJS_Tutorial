@@ -1,3 +1,4 @@
+/*
 .option-bar {
     display: flex;
     justify-content: space-around;
@@ -13,4 +14,41 @@
     border-radius: 4px;
     background-color: #fff;
     font-size: 14px;
+}
+    */
+
+/* 옵션 바 기본 스타일 */
+.option-bar {
+    display: flex;
+    flex-wrap: wrap; /* 줄바꿈을 허용 */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    gap: 10px;
+}
+
+/* 옵션 바 내부 요소 스타일 */
+.option-bar .option-item {
+    flex: 1 1 auto; /* 요소가 필요에 따라 크기를 조절하도록 설정 */
+    min-width: 100px; /* 최소 너비 설정 */
+    max-width: 200px; /* 최대 너비 설정 */
+    padding: 5px 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* 모바일에서 옵션 바 스타일 조정 */
+@media (max-width: 768px) {
+    .option-bar {
+        flex-direction: column; /* 세로로 정렬 */
+        align-items: stretch; /* 아이템이 전체 너비를 차지하게 설정 */
+    }
+
+    .option-bar .option-item {
+        max-width: none; /* 최대 너비 제한 제거 */
+        min-width: 100%; /* 각 아이템이 전체 너비를 차지하도록 설정 */
+    }
 }
