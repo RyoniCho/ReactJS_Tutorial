@@ -26,8 +26,11 @@ function RegistInfo()
     //Category
     const [selectedCategory,setSelectedCategory]=useState('');
 
-    //Extra Images
-    const [extraImageUrls, setExtraImageUrls] = useState([]);
+    //Extra Image Urls
+    const [urlsExtraImage, setUrlsExtraImage] = useState([]);
+
+    //Trailer Url
+    const [urlTrailer,setUrlTrailer] = useState('');
 
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -98,12 +101,15 @@ function RegistInfo()
         for(let i=1; i<=10;i++)
         {
             let extraImgUrl=`https://pics.dmm.co.jp/digital/video/${revisedSerialNumber}/${revisedSerialNumber}jp-${i}.jpg`
-            setExtraImageUrls((currentArray) => [extraImgUrl, ...currentArray]);
+            setUrlsExtraImage((currentArray) => [extraImgUrl, ...currentArray]);
             
         }
         
         setUrlImage(url);
+
+        const trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
         
+        setUrlTrailer(trailerUrl);
     }
 
     const OnSubmit = async (e) => {
@@ -127,7 +133,10 @@ function RegistInfo()
         formData.append('description', description);
         formData.append('releaseDate', releaseDate);
         formData.append('category',(selectedCategory==="")?"Unknown":selectedCategory);
+
         formData.append('urlImage',urlImage);
+        formData.append('urlTrailer',urlTrailer);
+        formData.append('urlsExtraImage',urlsExtraImage);
 
         setIsUploading(true);
         setUploadProgress(0);
@@ -251,16 +260,31 @@ function RegistInfo()
                         />)
                     }
 
-                    {(extraImageUrls.length>0) ? <ExtraImageSlider images={extraImageUrls}/> : <></>}
+                    {(urlsExtraImage.length>0) ? <ExtraImageSlider images={urlsExtraImage}/> : <></>}
                     
                 </div>
                 <div>
                     <label>Trailer:</label>
-                    <input
+                    {
+                        (urlTrailer !=='') ?
+                        (
+                            <video controls className="trailer-fetched">
+                            <source src={urlTrailer} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        )
+                        
+                        :
+                        
+                        (
+                        <input
                         type="file"
                         onChange={(e) => setTrailer(e.target.files[0])}
                         required
                     />
+                        )
+                    }
+                    
                 </div>
                 <div>
                     <label>Release Date:</label>
