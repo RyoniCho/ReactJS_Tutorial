@@ -18,6 +18,7 @@ const AMovieDetail = ({isAuthenticated}) => {
                 const response = await fetch(url);
                 console.log("AmovieDetail Response:"+response)
                 const data = await response.json();
+                console.log("AmovieDetail Response Json:"+data);
                 setMovie(data);
             } catch (error) {
                 console.error('Error fetching movie:', error);
