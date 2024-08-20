@@ -64,7 +64,7 @@ const AMovieDetail = ({isAuthenticated}) => {
         <div className="movie-detail">
             <h2>{movie.title}</h2>
             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
-            {(movie.extraImages) ? <ExtraImageSlider images={movie.extraImages}/> : <></>}
+            {(movie.extraImage) ? <ExtraImageSlider images={movie.extraImage}/> : <></>}
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
