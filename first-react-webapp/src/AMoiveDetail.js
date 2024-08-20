@@ -18,7 +18,6 @@ const AMovieDetail = ({isAuthenticated}) => {
                 const response = await fetch(url);
                 console.log("AmovieDetail Response:"+response)
                 const data = await response.json();
-                console.log("AmovieDetail Response Json:"+data);
                 setMovie(data);
             } catch (error) {
                 console.error('Error fetching movie:', error);
@@ -65,7 +64,7 @@ const AMovieDetail = ({isAuthenticated}) => {
         <div className="movie-detail">
             <h2>{movie.title}</h2>
             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
-            {(movie.extraImage) ? <ExtraImageSlider images={movie.extraImage}/> : <></>}
+            {(movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)}/> : <></>}
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
