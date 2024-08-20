@@ -26,13 +26,13 @@ const ExtraImageSlider = ({ images }) => {
             </div>
             <div className="slider-controls-container">
                 <div className="slider-controls">
-                    <button className="slider-button prev-btn" onClick={prevImage}>
+                    <button type="button" className="slider-button prev-btn" onClick={prevImage}>
                         Prev
                     </button>
                     <div className="slider-indicator">
                         {currentImageIndex + 1}/{images.length}
                     </div>
-                    <button className="slider-button next-btn" onClick={nextImage}>
+                    <button type="button" className="slider-button next-btn" onClick={nextImage}>
                         Next
                     </button>
                 </div>
