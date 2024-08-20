@@ -1,25 +1,59 @@
-.image-slider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+
+
+.slider-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
 }
 
-.image-slider img {
-    max-width: 80%;
-    height: auto;
+.slider {
+    width: 100%;
+    overflow: hidden;
     border-radius: 8px;
 }
 
-.image-slider button {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
+.slider-image {
+    width: 100%;
+    max-height: 500px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 
-.image-slider button:hover {
-    background-color: #555;
+.slider-controls {
+    display: flex;
+    justify-content: center; /* Centering the controls */
+    align-items: center;
+    margin-top: 10px;
+}
+
+.slider-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin: 0 10px; /* Reduce the margin between buttons */
+}
+
+.slider-button:hover {
+    background-color: #2980b9;
+}
+
+.slider-indicator {
+    font-size: 16px;
+    color: #555;
+    background-color: #f3f3f3;
+    border-radius: 20px;
+    padding: 5px 15px;
+    text-align: center;
+    margin: 0 10px; /* Ensure indicator spacing is consistent */
+}
+
+.slider-controls-container {
+    margin-bottom: 20px; /* Space below the buttons */
 }

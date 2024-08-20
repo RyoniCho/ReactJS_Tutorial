@@ -16,10 +16,27 @@ const ExtraImageSlider = ({ images }) => {
     };
 
     return (
-        <div className="image-slider">
-            <button type="button" onClick={prevImage}>Previous</button>
-            <img src={images[currentImageIndex]} alt="Movie still" />
-            <button type="button" onClick={nextImage}>Next</button>
+    <div className="slider-container">
+            <div className="slider">
+                <img
+                    src={images[currentImageIndex]}
+                    alt={`Slide ${currentImageIndex + 1}`}
+                    className="slider-image"
+                />
+            </div>
+            <div className="slider-controls-container">
+                <div className="slider-controls">
+                    <button className="slider-button prev-btn" onClick={prevImage}>
+                        Prev
+                    </button>
+                    <div className="slider-indicator">
+                        {currentImageIndex + 1}/{images.length}
+                    </div>
+                    <button className="slider-button next-btn" onClick={nextImage}>
+                        Next
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

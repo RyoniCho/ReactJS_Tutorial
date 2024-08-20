@@ -197,7 +197,7 @@ function RegistInfo()
                         onChange={(e) => setSerialNumber(e.target.value)}
                         required
                     />
-                    {(selectedCategory==="AdultVideo")?(<button onClick={FetchInformationsFromWeb}>Try to Infomations from web</button>):(<></>)}
+                    {(selectedCategory==="AdultVideo")?(<button type="button" onClick={FetchInformationsFromWeb}>Try to Infomations from web</button>):(<></>)}
                 </div>
                 <div>
                     <label>Title:</label>
