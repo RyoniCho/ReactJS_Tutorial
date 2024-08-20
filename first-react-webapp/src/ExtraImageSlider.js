@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import "./Styles/ExtraImageSlider.css"
 
 const ExtraImageSlider = ({ images }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
