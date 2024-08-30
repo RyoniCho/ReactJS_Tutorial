@@ -5,7 +5,7 @@ import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from './ExtraImageSlider';
 
-const AMovieDetail = ({isAuthenticated}) => {
+const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
     const [movie, setMovie] = useState(null);
     const navigate = useNavigate();
@@ -63,8 +63,11 @@ const AMovieDetail = ({isAuthenticated}) => {
     return (
         <div className="movie-detail">
             <h2>{movie.title}</h2>
+            <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
-            {(movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)}/> : <></>}
+            </div>
+            {(movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)} blur={isNSFWContentBlured}/> : <></>}
+            
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />

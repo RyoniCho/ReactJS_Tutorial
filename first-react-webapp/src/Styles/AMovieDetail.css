@@ -113,6 +113,11 @@
     background-color: #c0392b;
 }
 
+.blur {
+    filter: blur(15px); /* 블러 강도 조절 가능 */
+    transition: filter 0.3s ease; /* 블러 제거/적용 시 애니메이션 */
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .movie-detail-content {

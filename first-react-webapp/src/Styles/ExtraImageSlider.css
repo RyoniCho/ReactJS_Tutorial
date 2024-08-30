@@ -57,3 +57,8 @@
 .slider-controls-container {
     margin-bottom: 20px; /* Space below the buttons */
 }
+
+.blur {
+    filter: blur(15px); /* 블러 강도 조절 가능 */
+    transition: filter 0.3s ease; /* 블러 제거/적용 시 애니메이션 */
+}

@@ -12,11 +12,21 @@ import Login from "./Login";
 function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isNSFWContentBlured,setIsNSFWContentBlured] = useState(true);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
+        const nsfwToggle= localStorage.getItem("nsfwtoggle");
         if (token) {
             setIsAuthenticated(true);
+        }
+        if(nsfwToggle)
+        {
+            console.log("nsfw localstorage:"+nsfwToggle)
+            setIsNSFWContentBlured(nsfwToggle==="true")
+        }
+        else{
+            console.log("nsfw localstoragedddddd")
         }
     }, []);
 
@@ -29,6 +39,17 @@ function App() {
         setIsAuthenticated(false);
     };
 
+    const handleToggle = () =>{
+        
+        localStorage.setItem("nsfwtoggle",!isNSFWContentBlured);
+        setIsNSFWContentBlured(current=>
+            current=!current
+
+        );
+
+        
+    }
+
  
 
   return (
@@ -36,17 +57,27 @@ function App() {
     <Router>
             <div className="app">
                 <h1>Movie App</h1>
+                 {/* 토글 버튼 */}
+                 <fieldset>
+                    <label>
+                            <input role="switch" type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
+                            <span>NSFW SAFE</span>
+                    </label>
+                </fieldset>
                 <nav>
                     <Link to="/">Home</Link>
                     {isAuthenticated? <Link to="/add">Add Movie</Link>:<></>}
                     {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
                     (<Link to="/login">Login</Link>)}
+                     
+                    
+                    
                 </nav>
-               
+                
                 
                 <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated}/>} />
-                    <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated}/>} />
+                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
+                    <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>
                     <Route path="/login" element={<Login onLogin={handleLogin}/>}/>

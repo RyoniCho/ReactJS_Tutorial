@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./Styles/ExtraImageSlider.css"
 
-const ExtraImageSlider = ({ images }) => {
+const ExtraImageSlider = ({ images,blur }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const nextImage = () => {
@@ -18,11 +18,13 @@ const ExtraImageSlider = ({ images }) => {
     return (
     <div className="slider-container">
             <div className="slider">
-                <img
-                    src={images[currentImageIndex]}
-                    alt={`Slide ${currentImageIndex + 1}`}
-                    className="slider-image"
-                />
+                <div className={`${blur ? 'blur' : ''}`}>
+                    <img
+                        src={images[currentImageIndex]}
+                        alt={`Slide ${currentImageIndex + 1}`}
+                        className="slider-image"
+                    />
+                </div>
             </div>
             <div className="slider-controls-container">
                 <div className="slider-controls">

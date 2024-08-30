@@ -5,7 +5,7 @@ import Config from './Config'
 import axios from 'axios';
 import OptionBar from './OptionBar';
 
-const AMovieList = ({isAuthenticated}) => {
+const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [actors, setActors] = useState([]);
@@ -168,7 +168,9 @@ const AMovieList = ({isAuthenticated}) => {
                         <div className="movie-info">
                             <p>{movie.serialNumber}</p>
                         </div>
+                            <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
                             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
+                            </div>
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
                                 <h4>보유여부: {movie.plexRegistered ? 'O' : 'X'}</h4>
