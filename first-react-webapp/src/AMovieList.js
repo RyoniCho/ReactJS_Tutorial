@@ -17,11 +17,41 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
 
     useEffect(() => {
+        getCachedValue();
+
         fetchMovies();
         fetchActors();
        
+       
 
     }, []);
+    const getCachedValue = ()=>{
+        const cachedSortOrder = localStorage.getItem("sortorder");
+        const cachedSelectedActor = localStorage.getItem("selectedActor");
+        const cachedOwned= localStorage.getItem("owned");
+        const cachedSelectedCategory=localStorage.getItem("selectedCategory");
+
+        if(cachedSortOrder)
+        {
+            setSortOrder(cachedSortOrder);
+        }
+
+        if(cachedSelectedActor)
+        {
+            setSelectedActor(cachedSelectedActor);
+        }
+
+        if(cachedOwned)
+        {
+            setOwned(cachedOwned);
+        }
+
+        if(cachedSelectedCategory)
+        {
+            setSelectedCategory(cachedSelectedCategory);
+        }
+
+    }
 
     const fetchMovies = async (query = '') => {
         try {
@@ -138,19 +168,43 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             }
         });
 
+    const HandleSetSortOrder=(value)=>{
+
+        localStorage.setItem("sortorder",value);
+        setSortOrder(value);
+    }
+    
+    const HandleSetSelectedActor=(value)=>{
+
+        localStorage.setItem("selectedActor",value);
+        setSelectedActor(value);
+    }
+
+    const HandleSetOwned=(value)=>{
+
+        localStorage.setItem("owned",value);
+        setOwned(value);
+    }
+
+    const HandleSetSelectedCategory=(value)=>{
+
+        localStorage.setItem("selectedCategory",value);
+        setSelectedCategory(value);
+    }
+
     return (
     <div>    
         <OptionBar
             isAuthenticated={isAuthenticated}
             actors={actors}
             selectedActor={selectedActor}
-            setSelectedActor={setSelectedActor}
+            setSelectedActor={HandleSetSelectedActor}
             sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
+            setSortOrder={HandleSetSortOrder}
             owned={owned}
-            setOwned={setOwned}
+            setOwned={HandleSetOwned}
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            setSelectedCategory={HandleSetSelectedCategory}
 
          />
         <div className="movie-list">
