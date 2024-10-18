@@ -131,8 +131,8 @@ function EditMovie() {
                 <input type="date" name="releaseDate" value={movie.releaseDate} onChange={handleChange} />
             </label>
             <label>
-                Title:
-                <input type="text" name="main Movie" value={movie.mainMovie} onChange={handleChange} />
+                Main Movie Path:
+                <input type="text" name="mainMovie" value={movie.mainMovie} onChange={handleChange} />
             </label>
             
             <button type="submit">Save Changes</button>
