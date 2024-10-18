@@ -17,6 +17,7 @@ function RegistInfo()
     const [releaseDate,setReleaseDate] = useState(Date.now);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [mainMoviePath,setMainMoviePath] =useState('');
 
     //Actors
     const [actors, setActors] = useState([]);
@@ -137,6 +138,7 @@ function RegistInfo()
         formData.append('urlImage',urlImage);
         formData.append('urlTrailer',urlTrailer);
         formData.append('urlsExtraImage',urlsExtraImage);
+        formData.append('mainMoviePath', mainMoviePath);
 
         setIsUploading(true);
         setUploadProgress(0);
@@ -159,6 +161,7 @@ function RegistInfo()
             setTitle('');
             setImage(null);
             setTrailer(null);
+            setMainMoviePath('')
 
             navigate('/'); // 메인 페이지로 이동
         }
@@ -285,6 +288,13 @@ function RegistInfo()
                         )
                     }
                     
+                </div>
+                <div>
+                    <label>Main Movie</label>
+                    {
+                        <input type="text" placeholder="Type Main Movie Path.." value={mainMoviePath}
+                        onChange={(e) => setMainMoviePath(e.target.value)}/>
+                    }
                 </div>
                 <div>
                     <label>Release Date:</label>

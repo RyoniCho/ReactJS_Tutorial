@@ -73,6 +73,10 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
+                <video controls className="movie-detail-trailer">
+                    <source src={`${Config.apiUrl}/${movie.mainMovie}`} type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
                 <div className="movie-detail-info">
                     <p><strong>Category:</strong> {movie.category.toUpperCase()}</p>
                     <p><strong>Serial Number:</strong> {movie.serialNumber}</p>
