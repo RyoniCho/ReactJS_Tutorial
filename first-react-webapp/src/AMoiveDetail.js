@@ -74,7 +74,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     Your browser does not support the video tag.
                 </video>
                 <video controls className="movie-detail-trailer">
-                    <source src={`${Config.apiUrl}/${movie.mainMovie}`} type="video/mp4" />
+                    <source src={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}?resolution=720p`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
                 <div className="movie-detail-info">
