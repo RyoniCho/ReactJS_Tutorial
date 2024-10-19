@@ -10,12 +10,14 @@ function HLSVideoPlayer({ videoSrc }) {
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play();
+        //video.play();
+        console.log("Video ready to play.");
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = videoSrc;
       video.addEventListener('loadedmetadata', () => {
-        video.play();
+        //video.play();
+        console.log("Video ready to play.");
       });
     }
   }, [videoSrc]);
