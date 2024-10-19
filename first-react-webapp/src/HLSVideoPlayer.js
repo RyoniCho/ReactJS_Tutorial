@@ -1,28 +1,30 @@
 import React, { useEffect } from 'react';
-import videojs from 'video.js';
-import 'video.js/dist/video-js.css';
+import Hls from 'hls.js';
 
 function HLSVideoPlayer({ videoSrc }) {
-    useEffect(() => {
-      const player = videojs(document.getElementById('my-video'), {
-        controls: true,
-        autoplay: false,
-        preload: 'auto',
+  useEffect(() => {
+    const video = document.getElementById('my-video');
+    
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play();
       });
-  
-      return () => {
-        player.dispose();
-      };
-    }, [videoSrc]);
-  
-    return (
-      <div>
-        <video id="my-video" className="video-js vjs-default-skin" controls>
-          <source src={videoSrc} type="application/x-mpegURL" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-    );
-  }
-  
-  export default HLSVideoPlayer;
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', () => {
+        video.play();
+      });
+    }
+  }, [videoSrc]);
+
+  return (
+    <div>
+      <video id="my-video" controls width="100%" />
+    </div>
+  );
+}
+
+export default HLSVideoPlayer;
