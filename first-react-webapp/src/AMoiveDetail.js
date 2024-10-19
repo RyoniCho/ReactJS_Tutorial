@@ -4,6 +4,7 @@ import './Styles/AMovieDetail.css'
 import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from './ExtraImageSlider';
+import HLSVideoPlayer from './HLSVideoPlayer';
 
 const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
@@ -73,10 +74,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
-                <video controls className="movie-detail-trailer" preload="auto">
-                    <source src={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
+                {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} /> : <></>}
+                
                 <div className="movie-detail-info">
                     <p><strong>Category:</strong> {movie.category.toUpperCase()}</p>
                     <p><strong>Serial Number:</strong> {movie.serialNumber}</p>
