@@ -74,7 +74,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
-                {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} /> : <></>}
+                
                 
                 <div className="movie-detail-info">
                     <p><strong>Category:</strong> {movie.category.toUpperCase()}</p>
@@ -98,6 +98,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     
                 </div>
             </div>
+
+            {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} /> : <></>}
         </div>
     );
 };
