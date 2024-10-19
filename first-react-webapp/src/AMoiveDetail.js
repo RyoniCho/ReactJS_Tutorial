@@ -5,6 +5,7 @@ import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from './ExtraImageSlider';
 import HLSVideoPlayer from './HLSVideoPlayer';
+import openNewWindowWithPlayer from './openNewWindowWithPlayer';
 
 const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
@@ -74,7 +75,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <source src={`${Config.apiUrl}/${movie.trailer}`} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
-                {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} /> : <></>}
+                
                 
                 <div className="movie-detail-info">
                     <p><strong>Category:</strong> {movie.category.toUpperCase()}</p>
@@ -94,6 +95,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     </div>
                     ): (<></>)
                    }
+
+                    {(movie.mainMovie!=='') ? <button onClick={()=>{openNewWindowWithPlayer(`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`)}}/> : <></>}
                     
                     
                 </div>
