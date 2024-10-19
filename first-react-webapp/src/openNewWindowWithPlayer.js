@@ -19,7 +19,6 @@ function openNewWindowWithPlayer(videoSrc)
         </head>
         <body>
             <div id="video-player-root"></div>
-            <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
         </body>
         </html>
         `
