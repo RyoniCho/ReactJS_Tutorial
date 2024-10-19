@@ -98,8 +98,12 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     
                 </div>
             </div>
-
+            <div>
+            
+            {(movie.mainMovie!=='') ? <h4>Main Movie</h4> : <></>}
             {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} /> : <></>}
+            </div>
+           
         </div>
     );
 };
