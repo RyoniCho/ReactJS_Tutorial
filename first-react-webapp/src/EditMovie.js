@@ -19,7 +19,9 @@ function EditMovie() {
         plexRegistered: false,
         releaseDate: Date.now(),
         category:'Unknown',
-        mainMovie:''
+        mainMovie:'',
+        mainMovieSub:''
+        
         
     });
 
