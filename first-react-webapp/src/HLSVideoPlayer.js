@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Hls from 'hls.js';
 
-function HLSVideoPlayer({ videoSrc }) {
+function HLSVideoPlayer({ videoSrc,subSrc }) {
   useEffect(() => {
     const video = document.getElementById('my-video');
     
@@ -24,7 +24,11 @@ function HLSVideoPlayer({ videoSrc }) {
 
   return (
     <div>
-      <video id="my-video" controls width="100%" />
+      <video id="my-video" controls width="100%" >
+        {
+          (subSrc.includes(".vtt")) ? <track kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> :<></>
+        }
+      </video>
     </div>
   );
 }
