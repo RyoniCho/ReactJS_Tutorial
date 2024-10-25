@@ -7,12 +7,16 @@ import './Styles/App.css';
 import EditMovie from "./EditMovie";
 import { useState,useEffect } from "react";
 import Login from "./Login";
+import { useLocation } from 'react-router-dom';
+
 
 
 function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isNSFWContentBlured,setIsNSFWContentBlured] = useState(true);
+  const location = useLocation();
+  const [scrollPositions, setScrollPositions] = useState({});
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -29,6 +33,26 @@ function App() {
             console.log("nsfw localstoragedddddd")
         }
     }, []);
+
+    useEffect(() => {
+        // 페이지를 떠날 때 스크롤 위치를 저장
+        return () => {
+          setScrollPositions((prev) => ({
+            ...prev,
+            [location.pathname]: window.scrollY,
+          }));
+        };
+      }, [location.pathname]);
+    
+      useEffect(() => {
+        // 새 경로로 이동 시 저장된 위치로 스크롤 복원
+        const savedPosition = scrollPositions[location.pathname];
+        if (savedPosition !== undefined) {
+          window.scrollTo(0, savedPosition);
+        }
+      }, [location.pathname, scrollPositions]);
+
+      
 
     const handleLogin = () => {
         setIsAuthenticated(true);
