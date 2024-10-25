@@ -4,8 +4,8 @@ import './Styles/AMovieList.css';
 import Config from './Config'
 import axios from 'axios';
 import OptionBar from './OptionBar';
-import plexIcon  from './Icons/plex.svg'
-import webIcon from './Icons/web.svg'
+import PlexIcon from './Icons/plexIcon';
+import WebIcon from './Icons/webIcon';
 
 const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [movies, setMovies] = useState([]);
@@ -195,7 +195,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     }
 
     const ShowOwnedType=(movie)=>{
-        return ((movie.plexRegistered? <img src = {plexIcon}/>:<></> ) (movie.mainMovie !=='' ? <img src = {webIcon}></img>: <></>))
+        return ((movie.plexRegistered? {PlexIcon}:<></>) ((movie.mainMovie !=='' ? {WebIcon}:<></>)))
     }
 
     return (
