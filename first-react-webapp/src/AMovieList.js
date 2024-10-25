@@ -4,6 +4,8 @@ import './Styles/AMovieList.css';
 import Config from './Config'
 import axios from 'axios';
 import OptionBar from './OptionBar';
+import plexIcon  from './Icons/plex.svg'
+import webIcon from './Icons/web.svg'
 
 const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [movies, setMovies] = useState([]);
@@ -192,6 +194,10 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         setSelectedCategory(value);
     }
 
+    const ShowOwnedType=(movie)=>{
+        return ((movie.plexRegistered? <img src = {plexIcon}/>:<></> ) (movie.mainMovie !=='' ? <img src = {webIcon}></img>: <></>))
+    }
+
     return (
     <div>    
         <OptionBar
@@ -227,7 +233,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
                             </div>
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
-                                <h4>보유여부: {movie.plexRegistered ? 'O' : 'X'}</h4>
+                                <h4>보유여부: {(!movie.plexRegistered&&movie.mainMovie==='') ? 'X': (ShowOwnedType(movie)) }</h4>
                                 <div className='release-date'>
                                     <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
                                 </div>
