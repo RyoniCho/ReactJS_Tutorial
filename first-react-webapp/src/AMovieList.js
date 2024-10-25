@@ -15,6 +15,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
     const [owned, setOwned] = useState('all'); // 'all', 'plex','web', 'false'
     const [selectedCategory, setSelectedCategory]= useState('');
+    const [subscriptExist, setSubscriptExist] = useState('all');
    
 
 
@@ -32,6 +33,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         const cachedSelectedActor = localStorage.getItem("selectedActor");
         const cachedOwned= localStorage.getItem("owned");
         const cachedSelectedCategory=localStorage.getItem("selectedCategory");
+        const cachedSubscriptExist = localStorage.getItem("subscriptExist");
 
         if(cachedSortOrder)
         {
@@ -51,6 +53,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         if(cachedSelectedCategory)
         {
             setSelectedCategory(cachedSelectedCategory);
+        }
+
+        if(cachedSubscriptExist)
+        {
+            setSubscriptExist(cachedSubscriptExist);
         }
 
     }
@@ -120,6 +127,18 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             if (owned === 'web') return movie.mainMovie!=='';
             if (owned === 'false') return movie.plexRegistered === false && movie.mainMovie==='';
             return true;
+        })
+        .filter(movie => {
+            if(subscriptExist==='all')
+                return true;
+            else
+            {
+                if(subscriptExist === 'true') 
+                    return  movie.subscriptExist === true;
+                else
+                    return movie.subscriptExist === false;
+            }
+
         })
         .filter(movie=> {
             if(selectedCategory)
@@ -195,6 +214,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         setSelectedCategory(value);
     }
 
+    const HandleSetSubscriptExist = (value)=>{
+        localStorage.setItem("subscriptExist",value);
+        setSubscriptExist(value);
+    }
+
     const ShowOwnedType=(plexRegistered, mainMovie)=>{
         return (<div>{plexRegistered? <img src = {plexIcon} className="icon-small"/>:<></>} {(mainMovie !=='') ? <img src = {webIcon} className="icon-small"/>: <></>}</div>)
        
@@ -213,6 +237,8 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             setOwned={HandleSetOwned}
             selectedCategory={selectedCategory}
             setSelectedCategory={HandleSetSelectedCategory}
+            subscriptExist = {subscriptExist}
+            setSubscriptExist={HandleSetSubscriptExist}
 
          />
         <div className="movie-list">

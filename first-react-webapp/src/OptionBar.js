@@ -1,6 +1,6 @@
 import "./Styles/OptionBar.css"
 import Config from "./Config";
-function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, sortOrder, setSortOrder, owned, setOwned, selectedCategory,setSelectedCategory }) {
+function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, sortOrder, setSortOrder, owned, setOwned, selectedCategory,setSelectedCategory,subscriptExist,setSubscriptExist }) {
 
     const filteredCategories = Config.categories.filter(cate=>
         (!isAuthenticated&&cate == "AdultVideo") ? false:true
@@ -30,6 +30,12 @@ function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, s
                 <select className="option-item" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
                     <option value="asc">Release Date: Ascending</option>
                     <option value="desc">Release Date: Descending</option>
+                </select>
+
+                <select className="option-item" value={subscriptExist} onChange={e => setSubscriptExist(e.target.value)}>
+                    <option value="all">Subscription: ALL</option>
+                    <option value="true">Subscription: O</option>
+                    <option value="false">Subscription: X</option>
                 </select>
             
                 <select className="option-item"  value={owned} onChange={e => setOwned(e.target.value)}>
