@@ -13,6 +13,7 @@ function RegistInfo()
     const [urlImage,setUrlImage] =useState('');
     const [trailer, setTrailer] = useState(null);
     const [plexRegistered, setPlexRegistered] = useState(false);
+    const [subscription, setSubscription] = useState(false);
     const [description, setDescription] = useState('');
     const [releaseDate,setReleaseDate] = useState(Date.now);
     const [isUploading, setIsUploading] = useState(false);
@@ -129,6 +130,7 @@ function RegistInfo()
         formData.append('serialNumber', serialNumber);
         formData.append('actor', selectedActor);
         formData.append('plexRegistered', plexRegistered);
+        formData.append('subscriptExist', subscription);
         formData.append('image', image);
         formData.append('trailer', trailer);
         formData.append('description', description);
@@ -248,6 +250,14 @@ function RegistInfo()
                         type="checkbox"
                         checked={plexRegistered}
                         onChange={(e) => setPlexRegistered(e.target.checked)}
+                    />
+                </div>
+                <div>
+                    <label>Subscription :</label>
+                    <input
+                        type="checkbox"
+                        checked={subscription}
+                        onChange={(e) => setSubscription(e.target.checked)}
                     />
                 </div>
                 <div>

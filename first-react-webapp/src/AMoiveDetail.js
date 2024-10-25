@@ -81,6 +81,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <p><strong>Serial Number:</strong> {movie.serialNumber}</p>
                     <p><strong>Actor:</strong> {movie.actor}</p>
                     <p><strong>Plex Registered:</strong> {movie.plexRegistered ? 'Yes' : 'No'}</p>
+                    <p><strong>Subscription:</strong> {movie.subscriptExist ? 'Yes' : 'No'}</p>
                     <p><strong>Description:</strong> {movie.description}</p>
                     <p><strong>Release Date:</strong> {GetReleaseDataStr(movie.releaseDate)}</p>
                    

@@ -236,6 +236,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
                                 <h4>보유여부: {(!movie.plexRegistered&&movie.mainMovie==='') ? 'X': (ShowOwnedType(movie.plexRegistered,movie.mainMovie)) }</h4>
+                                <h4>자막유뮤: {movie.subscriptExist ? 'O':'X'}</h4>
                                 <div className='release-date'>
                                     <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
                                 </div>

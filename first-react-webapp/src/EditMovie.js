@@ -16,6 +16,7 @@ function EditMovie() {
         description: '',
         actor: '',
         serialNumber: '',
+        subscriptExist:false,
         plexRegistered: false,
         releaseDate: Date.now(),
         category:'Unknown',
@@ -127,6 +128,10 @@ function EditMovie() {
             <label>
                 Plex Registered:
                 <input type="checkbox" name="plexRegistered" checked={movie.plexRegistered} onChange={handleCheckboxChange} />
+            </label>
+            <label>
+                Subscription:
+                <input type="checkbox" name="subscriptExist" checked={movie.subscriptExist} onChange={handleCheckboxChange} />
             </label>
             <label>
                 Release Date:
