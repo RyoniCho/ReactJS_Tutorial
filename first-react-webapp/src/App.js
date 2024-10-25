@@ -78,7 +78,7 @@ function App() {
 
   return (
    
-    <Router>
+    // <Router>
             <div className="app">
                 <h1>Movie App</h1>
                  {/* 토글 버튼 */}
@@ -107,7 +107,7 @@ function App() {
                     <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
                 </Routes>
             </div>
-        </Router>
+        // </Router>
   )
 
 }
