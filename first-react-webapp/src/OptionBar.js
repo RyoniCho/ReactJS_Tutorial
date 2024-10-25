@@ -34,7 +34,8 @@ function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, s
             
                 <select className="option-item"  value={owned} onChange={e => setOwned(e.target.value)}>
                     <option value="all">All</option>
-                    <option value="true">Owned</option>
+                    <option value="plex">Owned(Plex)</option>
+                    <option value="web">Owned(Web)</option>
                     <option value="false">Not Owned</option>
                 </select>
             

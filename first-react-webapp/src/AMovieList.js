@@ -13,7 +13,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [actors, setActors] = useState([]);
     const [selectedActor, setSelectedActor] = useState('');
     const [sortOrder, setSortOrder] = useState('asc'); // 'asc' for ascending, 'desc' for descending
-    const [owned, setOwned] = useState('all'); // 'all', 'true', 'false'
+    const [owned, setOwned] = useState('all'); // 'all', 'plex','web', 'false'
     const [selectedCategory, setSelectedCategory]= useState('');
    
 
@@ -116,8 +116,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const filteredMovies = movies
         .filter(movie => selectedActor ? movie.actor === selectedActor : true)
         .filter(movie => {
-            if (owned === 'true') return movie.plexRegistered === true;
-            if (owned === 'false') return movie.plexRegistered === false;
+            if (owned === 'plex') return movie.plexRegistered === true;
+            if (owned === 'web') return movie.mainMovie!=='';
+            if (owned === 'false') return movie.plexRegistered === false && movie.mainMovie==='';
             return true;
         })
         .filter(movie=> {
@@ -194,8 +195,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         setSelectedCategory(value);
     }
 
-    const ShowOwnedType=(movie)=>{
-        return ((movie.plexRegistered? <img src = {plexIcon}/>:<></> ) (movie.mainMovie !=='' ? <img src = {webIcon}></img>: <></>))
+    const ShowOwnedType=(plexRegistered, mainMovie)=>{
+        return (<div>{plexRegistered? <img src = {plexIcon} className="icon-small"/>:<></>} {(mainMovie !=='') ? <img src = {webIcon} className="icon-small"/>: <></>}</div>)
+       
     }
 
     return (
@@ -233,7 +235,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
                             </div>
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
-                                <h4>보유여부: {(!movie.plexRegistered&&movie.mainMovie==='') ? 'X': (ShowOwnedType(movie)) }</h4>
+                                <h4>보유여부: {(!movie.plexRegistered&&movie.mainMovie==='') ? 'X': (ShowOwnedType(movie.plexRegistered,movie.mainMovie)) }</h4>
                                 <div className='release-date'>
                                     <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
                                 </div>
