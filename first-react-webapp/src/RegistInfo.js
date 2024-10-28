@@ -97,11 +97,6 @@ function RegistInfo()
         }
         const splitedSerialNumber= serialNumber.split("-");
         let revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
-        
-        if(splitedSerialNumber[0].toLowerCase()==="pfes")
-        {
-            revisedSerialNumber=`${splitedSerialNumber[0].toLowerCase()}${splitedSerialNumber[1]}`;
-        }
 
         
 
@@ -115,6 +110,12 @@ function RegistInfo()
         }
         
         setUrlImage(url);
+
+        //Trailer 경로 exception처리 (PFES)
+        if(splitedSerialNumber[0].toLowerCase()==="pfes")
+        {
+            revisedSerialNumber=`${splitedSerialNumber[0].toLowerCase()}${splitedSerialNumber[1]}`;
+        }
 
         const trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
         
