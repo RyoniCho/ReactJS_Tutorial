@@ -96,7 +96,14 @@ function RegistInfo()
             return;
         }
         const splitedSerialNumber= serialNumber.split("-");
-        const revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
+        let revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
+        
+        if(splitedSerialNumber[0].toLowerCase()==="pfes")
+        {
+            revisedSerialNumber=`${splitedSerialNumber[0].toLowerCase()}${splitedSerialNumber[1]}`;
+        }
+
+        
 
         const url =`https://pics.dmm.co.jp/digital/video/${revisedSerialNumber}/${revisedSerialNumber}pl.jpg`
 
