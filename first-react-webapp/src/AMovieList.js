@@ -85,7 +85,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         {
             
             setSelectedActor(cachedSelectedActor);
-            console.log(`cached Actor: ${selectedActor}`)
+            console.log(`cached Actor: ${cachedSelectedActor}/${selectedActor}`)
         }
 
         if(cachedOwned)
