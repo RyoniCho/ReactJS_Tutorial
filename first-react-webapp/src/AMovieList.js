@@ -58,6 +58,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         if(!initialFetch)
             return;
 
+        if(searchTerm!=='')
+            return
+
         const newFilters = createFilters({ 
             actor: selectedActor, 
             owned:owned,
@@ -209,6 +212,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const handleFilterChange = (newFilters) => {
         setMovies([]); // 기존 영화 목록 초기화
+        setSearchTerm('');
         fetchMovies('', newFilters, 1, pageSize); // 첫 페이지부터 다시 로드
     };
 
