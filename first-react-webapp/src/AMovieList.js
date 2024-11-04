@@ -53,6 +53,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     
     useEffect(() => {
+        console.log(`selectedActor:${selectedActor}`)
         const newFilters = createFilters({ 
             actor: selectedActor, 
             owned:owned,
@@ -82,7 +83,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
         if(cachedSelectedActor)
         {
+            
             setSelectedActor(cachedSelectedActor);
+            print(`cached Actor: ${selectedActor}`)
         }
 
         if(cachedOwned)
