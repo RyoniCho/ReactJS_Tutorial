@@ -8,6 +8,8 @@ import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
 
 const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
+
+    cosnt [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [actors, setActors] = useState([]);
@@ -38,7 +40,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
             debounceTimer = setTimeout(()=>{
 
-                if (window.innerHeight + document.documentElement.scrollTop+1>= document.documentElement.offsetHeight) {
+                if (window.innerHeight + document.documentElement.scrollTop+1>= document.documentElement.offsetHeight&&!isLoading) {
                     if(hasMore)
                         setCurrentPage(prevPage => prevPage + 1);
                 }
@@ -49,7 +51,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [hasMore]);
+    }, [hasMore,isLoading]);
 
 
     
@@ -125,7 +127,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
         try {
            
-
+            setIsLoading(true);
             const params = new URLSearchParams({
                 serialNumber: query,
                 ...filters,
@@ -150,6 +152,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
            
         } catch (error) {
             console.error('Error fetching movies:', error);
+        }
+        finally{
+            setIsLoading(false);
         }
     };
 
@@ -381,6 +386,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
                         }
                     </div>
                 ))}
+                {isLoading && <div className="loader"></div>}
             </div>
         </div>
     </div>
