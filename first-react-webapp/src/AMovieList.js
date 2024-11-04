@@ -21,12 +21,14 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     let debounceTimer;
     const [hasMore,setHasMore] = useState(true);
+    const [initialFetch,setInitialFetch] = useState(false);
 
 
     useEffect(() => {
         const initialFilter = getInitialFilterCachedValue();
         fetchActors();
         fetchMovies('', initialFilter, 1, pageSize);
+        setInitialFetch(true);
 
     }, []);
 
@@ -52,6 +54,10 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     
     useEffect(() => {
+
+        if(!initialFetch)
+            return;
+
         const newFilters = createFilters({ 
             actor: selectedActor, 
             owned:owned,
@@ -60,8 +66,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             sortOrder:sortOrder
         });
 
-        console.log(`FetchMovie-UseEffect: ${newFilters.actor}/${newFilters.owned}/${newFilters.subscriptExist}/${newFilters.category}/${newFilters.sortOrder}`)
-
+       
         fetchMovies('', newFilters, currentPage, pageSize);
     }, [currentPage]);
 
@@ -116,7 +121,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
         try {
-            console.log(`fetch movies :page ${page}`);
+           
 
             const params = new URLSearchParams({
                 serialNumber: query,
