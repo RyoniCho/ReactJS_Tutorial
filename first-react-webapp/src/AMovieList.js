@@ -24,10 +24,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
 
     useEffect(() => {
-        getCachedValue();
+        const initialFilter = getInitialFilterCachedValue();
         fetchActors();
-       
-       
+        fetchMovies('', initialFilter, 1, pageSize);
 
     }, []);
 
@@ -53,7 +52,6 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     
     useEffect(() => {
-        console.log(`selectedActor:${selectedActor}`)
         const newFilters = createFilters({ 
             actor: selectedActor, 
             owned:owned,
@@ -68,8 +66,8 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     }, [currentPage]);
 
 
-    const getCachedValue = ()=>{
-        console.log("GetCachedValue");
+    const getInitialFilterCachedValue = ()=>{
+     
         const cachedSortOrder = localStorage.getItem("sortorder");
         const cachedSelectedActor = localStorage.getItem("selectedActor");
         const cachedOwned= localStorage.getItem("owned");
@@ -85,7 +83,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         {
             
             setSelectedActor(cachedSelectedActor);
-            console.log(`cached Actor: ${cachedSelectedActor}/${selectedActor}`)
+           
         }
 
         if(cachedOwned)
@@ -102,6 +100,17 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         {
             setSubscriptExist(cachedSubscriptExist);
         }
+
+        const newFilters = createFilters({ 
+            actor: cachedSelectedActor, 
+            owned:cachedOwned,
+            subscriptExist:cachedSubscriptExist,
+            category:cachedSelectedCategory,
+            sortOrder:cachedSortOrder
+        });
+
+        return newFilters;
+
 
     }
 
