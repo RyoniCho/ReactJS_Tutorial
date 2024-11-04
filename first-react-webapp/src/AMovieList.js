@@ -9,7 +9,7 @@ import webIcon from './Icons/web.svg'
 
 const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
-    cosnt [isLoading,setIsLoading] = useState(false);
+    const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [actors, setActors] = useState([]);
