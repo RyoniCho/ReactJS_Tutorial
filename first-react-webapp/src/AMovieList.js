@@ -126,6 +126,13 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
         try {
+
+            const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                },
+            };
            
             setIsLoading(true);
             const params = new URLSearchParams({
@@ -136,7 +143,18 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             }).toString();
     
             const url = `${Config.apiUrl}/api/movies?${params}`
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    ...config.headers,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch movies');
+            }
+
             const data = await response.json();
             if(data.length >0)
             {
