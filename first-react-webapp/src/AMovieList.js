@@ -101,7 +101,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 20) => {
         try {
-            console.log("fetch movies");
+            console.log(`fetch movies :page ${page}`);
 
             const params = new URLSearchParams({
                 serialNumber: query,
@@ -117,10 +117,12 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             {
                 setMovies(prev => [...prev, ...data]); // 새 데이터 추가
                 setHasMore(true);
+                 
             }
             else
             {
                 setHasMore(false);
+                console.log("fetch Movie -> data is null");
             }
            
         } catch (error) {
