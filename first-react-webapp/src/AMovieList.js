@@ -188,6 +188,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
+        setMovies([]); //기존 영화 목록 초기화.
         fetchMovies(e.target.value); // 검색어가 입력될 때마다 fetchMovies 호출
     };
 
