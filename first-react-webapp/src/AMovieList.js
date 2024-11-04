@@ -54,7 +54,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     
     useEffect(() => {
         const newFilters = createFilters({ 
-            actor: actors, 
+            actor: selectedActor, 
             owned:owned,
             subscriptExist:subscriptExist,
             category:selectedCategory,
