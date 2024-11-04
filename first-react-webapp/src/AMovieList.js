@@ -16,18 +16,44 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [owned, setOwned] = useState('all'); // 'all', 'plex','web', 'false'
     const [selectedCategory, setSelectedCategory]= useState('');
     const [subscriptExist, setSubscriptExist] = useState('all');
-   
+    const [currentPage,setCurrentPage] =useState(1);
+    const pageSize=20;
 
 
     useEffect(() => {
         getCachedValue();
-
-        fetchMovies();
         fetchActors();
        
        
 
     }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                setCurrentPage(prevPage => prevPage + 1);
+            }
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+
+    
+    useEffect(() => {
+        const newFilters = createFilters({ 
+            actor: actors, 
+            owned:owned,
+            subscriptExist:subscriptExist,
+            category:selectedCategory,
+            sortOrder:sortOrder
+        });
+
+        fetchMovies('', newFilters, currentPage, pageSize);
+    }, [currentPage]);
+
+
     const getCachedValue = ()=>{
         const cachedSortOrder = localStorage.getItem("sortorder");
         const cachedSelectedActor = localStorage.getItem("selectedActor");
@@ -62,13 +88,21 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     }
 
-    const fetchMovies = async (query = '') => {
+    const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 20) => {
         try {
             console.log("fetch movies");
-            const url = `${Config.apiUrl}/api/movies?serialNumber=${query}`
+
+            const params = new URLSearchParams({
+                serialNumber: query,
+                ...filters,
+                page,
+                pageSize
+            }).toString();
+    
+            const url = `${Config.apiUrl}/api/movies?${params}`
             const response = await fetch(url);
             const data = await response.json();
-            setMovies(data);
+            setMovies(prev => [...prev, ...data]); // 새 데이터 추가
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
@@ -119,6 +153,21 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
         const date = new Date(d);
         return `${date.getFullYear().toString().substr(-2)}년 ${date.getMonth()+1}월`
     }
+
+    const createFilters = (updatedFilter) => {
+        return {
+            actor: updatedFilter.actor ?? selectedActor,
+            owned: updatedFilter.owned ?? owned,
+            subscriptExist: updatedFilter.subscriptExist ?? subscriptExist,
+            category: updatedFilter.category ?? selectedCategory,
+            sortOrder: updatedFilter.sortOrder ?? sortOrder,
+        };
+    };
+
+    const handleFilterChange = (newFilters) => {
+        setMovies([]); // 기존 영화 목록 초기화
+        fetchMovies('', newFilters, 1, pageSize); // 첫 페이지부터 다시 로드
+    };
 
     const filteredMovies = movies
         .filter(movie => selectedActor ? movie.actor === selectedActor : true)
@@ -194,29 +243,40 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
         localStorage.setItem("sortorder",value);
         setSortOrder(value);
+        console.log("sort order :"+value);
+        const newFilters = createFilters({ sortOrder: value });
+        handleFilterChange(newFilters);
     }
     
     const HandleSetSelectedActor=(value)=>{
 
         localStorage.setItem("selectedActor",value);
         setSelectedActor(value);
+        const newFilters = createFilters({ actor: value });
+        handleFilterChange(newFilters);
     }
 
     const HandleSetOwned=(value)=>{
 
         localStorage.setItem("owned",value);
         setOwned(value);
+        const newFilters = createFilters({ owned: value });
+        handleFilterChange(newFilters);
     }
 
     const HandleSetSelectedCategory=(value)=>{
 
         localStorage.setItem("selectedCategory",value);
         setSelectedCategory(value);
+        const newFilters = createFilters({ category: value });
+        handleFilterChange(newFilters);
     }
 
     const HandleSetSubscriptExist = (value)=>{
         localStorage.setItem("subscriptExist",value);
         setSubscriptExist(value);
+        const newFilters = createFilters({ subscriptExist: value });
+        handleFilterChange(newFilters);
     }
 
     const ShowOwnedType=(plexRegistered, mainMovie)=>{
@@ -250,7 +310,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
                 className="search-input"
             />
             <div className="movies">
-                {filteredMovies.map((movie) => (
+                {movies.map((movie) => (
                     <div key={movie._id} className="movie-card">
                         <Link to={`/movies/${movie._id}`} className="movie-link">
                         <div className="movie-info">
