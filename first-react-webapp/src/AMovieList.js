@@ -37,11 +37,13 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
             debounceTimer = setTimeout(()=>{
 
-            })
-            if (window.innerHeight + document.documentElement.scrollTop+1>= document.documentElement.offsetHeight) {
-                if(hasMore)
-                    setCurrentPage(prevPage => prevPage + 1);
-            }
+                if (window.innerHeight + document.documentElement.scrollTop+1>= document.documentElement.offsetHeight) {
+                    if(hasMore)
+                        setCurrentPage(prevPage => prevPage + 1);
+                }
+
+            },200)
+          
         };
     
         window.addEventListener('scroll', handleScroll);
