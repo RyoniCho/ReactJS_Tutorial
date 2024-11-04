@@ -61,11 +61,14 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             sortOrder:sortOrder
         });
 
+        console.log(`FetchMovie-UseEffect: ${newFilters.actor}/${newFilters.owned}/${newFilters.subscriptExist}/${newFilters.category}/${newFilters.sortOrder}`)
+
         fetchMovies('', newFilters, currentPage, pageSize);
     }, [currentPage]);
 
 
     const getCachedValue = ()=>{
+        console.log("GetCachedValue");
         const cachedSortOrder = localStorage.getItem("sortorder");
         const cachedSelectedActor = localStorage.getItem("selectedActor");
         const cachedOwned= localStorage.getItem("owned");
@@ -99,7 +102,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     }
 
-    const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 20) => {
+    const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
         try {
             console.log(`fetch movies :page ${page}`);
 
