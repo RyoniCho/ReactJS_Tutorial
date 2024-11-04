@@ -19,6 +19,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     const [currentPage,setCurrentPage] =useState(1);
     const pageSize=10;
 
+    let debounceTimer;
+    const [hasMore,setHasMore] = useState(true);
+
 
     useEffect(() => {
         getCachedValue();
@@ -30,14 +33,20 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-                setCurrentPage(prevPage => prevPage + 1);
+            if(debounceTimer) clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(()=>{
+
+            })
+            if (window.innerHeight + document.documentElement.scrollTop+1>= document.documentElement.offsetHeight) {
+                if(hasMore)
+                    setCurrentPage(prevPage => prevPage + 1);
             }
         };
     
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [hasMore]);
 
 
     
@@ -102,7 +111,16 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             const url = `${Config.apiUrl}/api/movies?${params}`
             const response = await fetch(url);
             const data = await response.json();
-            setMovies(prev => [...prev, ...data]); // 새 데이터 추가
+            if(data.length >0)
+            {
+                setMovies(prev => [...prev, ...data]); // 새 데이터 추가
+                setHasMore(true);
+            }
+            else
+            {
+                setHasMore(false);
+            }
+           
         } catch (error) {
             console.error('Error fetching movies:', error);
         }
