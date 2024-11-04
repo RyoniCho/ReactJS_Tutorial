@@ -100,12 +100,25 @@
       }
     
 
+      .loader-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* 딤처리 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* 가장 위에 표시 */
+    }
+    
     .loader {
         border: 4px solid rgba(0, 0, 0, 0.1);
-        border-left-color: #000;
+        border-left-color: #ffffff;
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
+        width: 48px;
+        height: 48px;
         animation: spin 1s linear infinite;
     }
     
