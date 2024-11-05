@@ -100,7 +100,7 @@ function App() {
                 
                 
                 <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
+                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout}/>} />
                     <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>

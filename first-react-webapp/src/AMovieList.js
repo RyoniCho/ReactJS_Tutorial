@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Config from './Config'
@@ -7,7 +8,7 @@ import OptionBar from './OptionBar';
 import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
 
-const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
+const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout}) => {
 
     const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
@@ -24,6 +25,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
     let debounceTimer;
     const [hasMore,setHasMore] = useState(true);
     const [initialFetch,setInitialFetch] = useState(false);
+    const navigate = useNavigate(); 
 
 
     useEffect(() => {
@@ -152,6 +154,12 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             });
 
             if (!response.ok) {
+
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+
                 throw new Error('Failed to fetch movies');
             }
 
@@ -211,6 +219,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured}) => {
             console.error('Error deleting movie:', error);
         }
     };
+
+    const handleUnauthorized=()=> {
+        handleLogout();
+        navigate('/login'); // 로그인 페이지로 리디렉션
+    }
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
