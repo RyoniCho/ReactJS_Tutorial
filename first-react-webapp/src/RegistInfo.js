@@ -98,6 +98,11 @@ function RegistInfo()
         const splitedSerialNumber= serialNumber.split("-");
         let revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
 
+        if(serialNumber.toLowerCase().startsWith('star'))
+        {
+            revisedSerialNumber = `1${revisedSerialNumber}`
+        }
+
         
 
         const url =`https://pics.dmm.co.jp/digital/video/${revisedSerialNumber}/${revisedSerialNumber}pl.jpg`
@@ -117,7 +122,12 @@ function RegistInfo()
             revisedSerialNumber=`${splitedSerialNumber[0].toLowerCase()}${splitedSerialNumber[1]}`;
         }
 
-        const trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
+        let trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
+        
+        if(serialNumber.toLowerCase().startsWith('star'))
+        {
+            trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/1${revisedSerialNumber[0]}/1${revisedSerialNumber.substring(0,3)}/1${revisedSerialNumber}/1${revisedSerialNumber}_mhb_w.mp4`
+        }
         
         setUrlTrailer(trailerUrl);
     }
