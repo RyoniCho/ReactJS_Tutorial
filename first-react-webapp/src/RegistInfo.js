@@ -126,7 +126,7 @@ function RegistInfo()
         
         if(serialNumber.toLowerCase().startsWith('star'))
         {
-            trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/1${revisedSerialNumber[0]}/1${revisedSerialNumber.substring(0,3)}/1${revisedSerialNumber}/1${revisedSerialNumber}_mhb_w.mp4`
+            trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,4)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
         }
         
         setUrlTrailer(trailerUrl);
