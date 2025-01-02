@@ -126,7 +126,18 @@ function RegistInfo()
         
         if(serialNumber.toLowerCase().startsWith('star'))
         {
-            trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,4)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
+            let shortenSerialNumber = revisedSerialNumber;
+            if(revisedSerialNumber.length>=11)
+            {
+                shortenSerialNumber= shortenSerialNumber.replace('00','');
+                       
+            }
+            else if(revisedSerialNumber.length>=10)
+            {
+                shortenSerialNumber= shortenSerialNumber.replace('0','');
+            }
+            
+            trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${shortenSerialNumber}_mhb_w.mp4`
         }
         
         setUrlTrailer(trailerUrl);
