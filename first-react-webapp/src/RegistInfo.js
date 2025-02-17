@@ -98,7 +98,7 @@ function RegistInfo()
         const splitedSerialNumber= serialNumber.split("-");
         let revisedSerialNumber= `${splitedSerialNumber[0].toLowerCase()}00${splitedSerialNumber[1]}`;
 
-        if(serialNumber.toLowerCase().startsWith('star'))
+        if(serialNumber.toLowerCase().startsWith('star')||serialNumber.toLowerCase().startsWith('fsdss'))
         {
             revisedSerialNumber = `1${revisedSerialNumber}`
         }
@@ -124,7 +124,7 @@ function RegistInfo()
 
         let trailerUrl = `https://cc3001.dmm.co.jp/litevideo/freepv/${revisedSerialNumber[0]}/${revisedSerialNumber.substring(0,3)}/${revisedSerialNumber}/${revisedSerialNumber}_mhb_w.mp4`
         
-        if(serialNumber.toLowerCase().startsWith('star'))
+        if(serialNumber.toLowerCase().startsWith('star')||serialNumber.toLowerCase().startsWith('fsdss'))
         {
             let shortenSerialNumber = revisedSerialNumber;
             if(revisedSerialNumber.length>=11)
