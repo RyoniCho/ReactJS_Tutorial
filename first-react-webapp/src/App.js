@@ -8,7 +8,7 @@ import EditMovie from "./EditMovie";
 import { useState,useEffect } from "react";
 import Login from "./Login";
 import { useLocation } from 'react-router-dom';
-
+import jwt_decode from "jwt-decode";
 
 
 function App() {
@@ -17,7 +17,7 @@ function App() {
   const [isNSFWContentBlured,setIsNSFWContentBlured] = useState(true);
   const location = useLocation();
   const [scrollPositions, setScrollPositions] = useState({});
-  const [role, setRole] = useState(null);
+  const [loginRole, setLoginRole] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -57,9 +57,9 @@ function App() {
 
       
 
-    const handleLogin = (loginRole) => {
+    const handleLogin = (_loginRole) => {
         setIsAuthenticated(true);
-        setRole(loginRole);
+        setRole(_loginRole);
     };
 
     const handleLogout = () => {
@@ -104,7 +104,7 @@ function App() {
                 
                 
                 <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={role}/>} />
+                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole}/>} />
                     <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>

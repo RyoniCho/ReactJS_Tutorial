@@ -95,7 +95,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <p><strong>Release Date:</strong> {GetReleaseDataStr(movie.releaseDate)}</p>
                    
                    {
-                    (isAuthenticated&& role === "admin")  ? (
+                    (isAuthenticated&& loginRole === "admin")  ? (
 
                         <div className='button-container'>
                          {/* 편집 버튼 */}
