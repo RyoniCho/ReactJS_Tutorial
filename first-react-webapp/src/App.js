@@ -8,7 +8,7 @@ import EditMovie from "./EditMovie";
 import { useState,useEffect } from "react";
 import Login from "./Login";
 import { useLocation } from 'react-router-dom';
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode"
 
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
         const nsfwToggle= localStorage.getItem("nsfwtoggle");
         if (token) {
             setIsAuthenticated(true);
-            const { role } = jwt_decode(token);
+            const { role } = jwtDecode(token);
             setLoginRole(role);
         }
         if(nsfwToggle)

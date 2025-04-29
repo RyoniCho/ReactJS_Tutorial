@@ -5,7 +5,7 @@ import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from './ExtraImageSlider';
 import HLSVideoPlayer from './HLSVideoPlayer';
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
@@ -17,7 +17,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
         const token = localStorage.getItem('token');
         if (token) {
-            const { role } = jwt_decode(token);
+            const { role } = jwtDecode(token);
             setLoginRole(role);
         }
 

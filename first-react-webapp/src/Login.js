@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Config from './Config'
 import './Styles/EditMovie.css'
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 
 const Login = ({ onLogin }) => {
@@ -17,7 +17,7 @@ const Login = ({ onLogin }) => {
         try {
             console.log("HandleLogin - "+username +"/"+password);
             const res = await axios.post(`${Config.apiUrl}/api/auth/login`,{username,password});
-            const { role } = jwt_decode(res.data.token);
+            const { role } = jwtDecode(res.data.token);
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('role', role);
 
