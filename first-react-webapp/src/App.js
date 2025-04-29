@@ -59,7 +59,7 @@ function App() {
 
     const handleLogin = (_loginRole) => {
         setIsAuthenticated(true);
-        setRole(_loginRole);
+        setLoginRole(_loginRole);
     };
 
     const handleLogout = () => {
@@ -94,7 +94,7 @@ function App() {
                 </fieldset>
                 <nav>
                     <Link to="/">Home</Link>
-                    {isAuthenticated&&role==="admin" ? <Link to="/add">Add Movie</Link>:<></>}
+                    {isAuthenticated&&loginRole==="admin" ? <Link to="/add">Add Movie</Link>:<></>}
                     {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
                     (<Link to="/login">Login</Link>)}
                      
