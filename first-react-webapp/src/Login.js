@@ -20,6 +20,7 @@ const Login = ({ onLogin }) => {
             const { role } = jwtDecode(res.data.token);
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('role', role);
+            console.log('role:'+role);
 
             onLogin(role);
             navigate('/'); 
