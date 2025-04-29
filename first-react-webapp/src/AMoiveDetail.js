@@ -5,13 +5,22 @@ import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from './ExtraImageSlider';
 import HLSVideoPlayer from './HLSVideoPlayer';
+import jwt_decode from "jwt-decode";
 
 const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
     const [movie, setMovie] = useState(null);
+    const [loginRole, setLoginRole] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            const { role } = jwt_decode(token);
+            setLoginRole(role);
+        }
+
         const fetchMovie = async () => {
             try {
                 const url = `${Config.apiUrl}/api/movies/${id}`;
@@ -86,7 +95,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <p><strong>Release Date:</strong> {GetReleaseDataStr(movie.releaseDate)}</p>
                    
                    {
-                    isAuthenticated ? (
+                    (isAuthenticated&& role === "admin")  ? (
 
                         <div className='button-container'>
                          {/* 편집 버튼 */}

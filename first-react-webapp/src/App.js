@@ -17,12 +17,15 @@ function App() {
   const [isNSFWContentBlured,setIsNSFWContentBlured] = useState(true);
   const location = useLocation();
   const [scrollPositions, setScrollPositions] = useState({});
+  const [role, setRole] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const nsfwToggle= localStorage.getItem("nsfwtoggle");
         if (token) {
             setIsAuthenticated(true);
+            const { role } = jwt_decode(token);
+            setLoginRole(role);
         }
         if(nsfwToggle)
         {
@@ -54,8 +57,9 @@ function App() {
 
       
 
-    const handleLogin = () => {
+    const handleLogin = (loginRole) => {
         setIsAuthenticated(true);
+        setRole(loginRole);
     };
 
     const handleLogout = () => {
@@ -90,7 +94,7 @@ function App() {
                 </fieldset>
                 <nav>
                     <Link to="/">Home</Link>
-                    {isAuthenticated? <Link to="/add">Add Movie</Link>:<></>}
+                    {isAuthenticated&&role==="admin" ? <Link to="/add">Add Movie</Link>:<></>}
                     {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
                     (<Link to="/login">Login</Link>)}
                      
@@ -100,7 +104,7 @@ function App() {
                 
                 
                 <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout}/>} />
+                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={role}/>} />
                     <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>

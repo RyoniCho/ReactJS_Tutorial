@@ -8,7 +8,7 @@ import OptionBar from './OptionBar';
 import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
 
-const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout}) => {
+const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}) => {
 
     const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
@@ -413,7 +413,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout}) => {
                             </div>
                         </Link>
                         {
-                            isAuthenticated? (<button onClick={() => deleteMovie(movie._id)} className="list-delete-button"> Delete</button>):(<></>)
+                            isAuthenticated&&loginRole==="admin"? (<button onClick={() => deleteMovie(movie._id)} className="list-delete-button"> Delete</button>):(<></>)
                         }
                     </div>
                 ))}
