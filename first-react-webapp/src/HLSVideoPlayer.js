@@ -65,14 +65,22 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     return () => clearInterval(interval);
   }, [movieId]);
 
-  // 이어보기 팝업 처리
+  // 이어보기 팝업: play 이벤트 발생 시에만
   useEffect(() => {
-    if (showResumePrompt && videoRef.current) {
-      if (window.confirm(`저장된 시청 기록이 있습니다. ${lastWatchedTime}초부터 이어서 재생할까요?`)) {
-        videoRef.current.currentTime = lastWatchedTime;
+    const video = videoRef.current;
+    if (!video) return;
+    const onPlay = () => {
+      if (showResumePrompt) {
+        if (window.confirm(`저장된 시청 기록이 있습니다. ${lastWatchedTime}초부터 이어서 재생할까요?`)) {
+          video.currentTime = lastWatchedTime;
+        }
+        setShowResumePrompt(false);
       }
-      setShowResumePrompt(false);
-    }
+    };
+    video.addEventListener('play', onPlay);
+    return () => {
+      video.removeEventListener('play', onPlay);
+    };
   }, [showResumePrompt, lastWatchedTime]);
 
   return (
