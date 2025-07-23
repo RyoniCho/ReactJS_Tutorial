@@ -111,7 +111,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             <div>
             
             {(movie.mainMovie!=='') ? <h4>Main Movie</h4> : <></>}
-            {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} subSrc={`${Config.apiUrl}/api/${movie.mainMovieSub}`} movieId={`${movie.id}`}/> : <></>}
+            {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} subSrc={`${Config.apiUrl}/api/${movie.mainMovieSub}`} movieId={`${id}`}/> : <></>}
             </div>
            
         </div>
