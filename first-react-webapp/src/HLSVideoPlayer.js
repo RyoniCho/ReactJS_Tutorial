@@ -65,13 +65,23 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     return () => clearInterval(interval);
   }, [movieId]);
 
+  // 초를 hh:mm:ss로 변환하는 함수
+  const formatTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return [h, m, s]
+      .map(v => v < 10 ? `0${v}` : `${v}`)
+      .join(':');
+  };
+
   // 이어보기 팝업: play 이벤트 발생 시에만
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     const onPlay = () => {
       if (showResumePrompt) {
-        if (window.confirm(`저장된 시청 기록이 있습니다. ${lastWatchedTime}초부터 이어서 재생할까요?`)) {
+        if (window.confirm(`저장된 시청 기록이 있습니다. ${formatTime(lastWatchedTime)}부터 이어서 재생할까요?`)) {
           video.currentTime = lastWatchedTime;
         }
         setShowResumePrompt(false);
