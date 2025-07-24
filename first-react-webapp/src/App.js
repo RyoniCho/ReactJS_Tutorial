@@ -1,4 +1,5 @@
 
+
 import RegistInfo from "./RegistInfo";
 import AMovieList from './AMovieList';
 import AMovieDetail from "./AMoiveDetail";
@@ -8,7 +9,8 @@ import EditMovie from "./EditMovie";
 import { useState,useEffect } from "react";
 import Login from "./Login";
 import { useLocation } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
+import AdminPage from './AdminPage';
 
 
 function App() {
@@ -94,12 +96,10 @@ function App() {
                 </fieldset>
                 <nav>
                     <Link to="/">Home</Link>
-                    {isAuthenticated&&loginRole==="admin" ? <Link to="/add">Add Movie</Link>:<></>}
+                    {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add Movie</Link> : <></>}
+                    {isAuthenticated && loginRole === "admin" ? <Link to="/admin">관리자</Link> : <></>}
                     {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
                     (<Link to="/login">Login</Link>)}
-                     
-                    
-                    
                 </nav>
                 
                 
@@ -109,6 +109,7 @@ function App() {
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>
                     <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
+                    <Route path="/admin" element={<AdminPage/>}/>
                 </Routes>
             </div>
         // </Router>
