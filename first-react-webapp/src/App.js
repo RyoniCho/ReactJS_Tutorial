@@ -2,6 +2,21 @@
 import axios from 'axios';
 import Config from './Config';
 
+
+
+
+import RegistInfo from "./RegistInfo";
+import AMovieList from './AMovieList';
+import AMovieDetail from "./AMoiveDetail";
+import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
+import './Styles/App.css';
+import EditMovie from "./EditMovie";
+import { useState,useEffect } from "react";
+import Login from "./Login";
+import { useLocation } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+import AdminPage from './AdminPage';
+
 // 요청 인터셉터: accessToken 자동 부착
 axios.interceptors.request.use(
   (config) => {
@@ -42,20 +57,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
-import RegistInfo from "./RegistInfo";
-import AMovieList from './AMovieList';
-import AMovieDetail from "./AMoiveDetail";
-import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
-import './Styles/App.css';
-import EditMovie from "./EditMovie";
-import { useState,useEffect } from "react";
-import Login from "./Login";
-import { useLocation } from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
-import AdminPage from './AdminPage';
-
 
 function App() {
 
