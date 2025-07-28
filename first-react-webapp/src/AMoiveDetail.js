@@ -15,9 +15,9 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
     useEffect(() => {
 
-        const token = localStorage.getItem('token');
-        if (token) {
-            const { role } = jwtDecode(token);
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+            const { role } = jwtDecode(accessToken);
             setLoginRole(role);
         }
 
@@ -42,10 +42,10 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             const isConfirmed = window.confirm('Are you sure you want to delete?');
             if(isConfirmed)
             {
-                const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+                const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
                 const config = {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                        'Authorization': `Bearer ${accessToken}`,
                         withCredentials: true
                     },
                 };

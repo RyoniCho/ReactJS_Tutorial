@@ -128,58 +128,74 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}
 
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
         try {
-
-            const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
-                },
-            };
-           
             setIsLoading(true);
+            const accessToken = localStorage.getItem('accessToken');
             const params = new URLSearchParams({
                 serialNumber: query,
                 ...filters,
                 page,
                 pageSize
             }).toString();
-    
-            const url = `${Config.apiUrl}/api/movies?${params}`
-            const response = await fetch(url, {
+            const url = `${Config.apiUrl}/api/movies?${params}`;
+
+            let response = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    ...config.headers,
+                    'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (!response.ok) {
-
-                if (response.status === 401) {
+            // accessToken 만료로 401이 오면 refreshToken으로 재발급 시도 후 재요청
+            if (response.status === 401) {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (refreshToken) {
+                    try {
+                        const refreshRes = await fetch(`${Config.apiUrl}/api/auth/refresh`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refreshToken })
+                        });
+                        if (refreshRes.ok) {
+                            const { accessToken: newAccessToken } = await refreshRes.json();
+                            localStorage.setItem('accessToken', newAccessToken);
+                            // 재시도
+                            response = await fetch(url, {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${newAccessToken}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                        } else {
+                            handleUnauthorized();
+                            return;
+                        }
+                    } catch {
+                        handleUnauthorized();
+                        return;
+                    }
+                } else {
                     handleUnauthorized();
                     return;
                 }
+            }
 
+            if (!response.ok) {
                 throw new Error('Failed to fetch movies');
             }
 
             const data = await response.json();
-            if(data.length >0)
-            {
+            if (data.length > 0) {
                 setMovies(prev => [...prev, ...data]); // 새 데이터 추가
                 setHasMore(true);
-                 
-            }
-            else
-            {
+            } else {
                 setHasMore(false);
                 console.log("fetch Movie -> data is null");
             }
-           
         } catch (error) {
             console.error('Error fetching movies:', error);
-        }
-        finally{
+        } finally {
             setIsLoading(false);
         }
     };
@@ -201,10 +217,10 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}
             const isConfirmed = window.confirm('Are you sure you want to delete?');
             if(isConfirmed)
             {
-                const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 가져오기
+                const accessToken = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
                 const config = {
                     headers: {
-                        'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                        'Authorization': `Bearer ${accessToken}`,
                         withCredentials: true
                     },
                 };

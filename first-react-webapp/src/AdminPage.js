@@ -10,12 +10,12 @@ const AdminPage = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const accessToken = localStorage.getItem('accessToken');
     try {
       const res = await axios.post(
         `${Config.apiUrl}/api/users`,
         { username, password, role },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${accessToken}` } }
       );
       setMessage('유저 등록 성공!');
       setUsername('');

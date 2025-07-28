@@ -1,14 +1,28 @@
 
+
 import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import axios from 'axios';
 import Config from './Config';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 
 function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
   const videoRef = useRef(null);
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const navigate = useNavigate();
+  // 토큰 만료 체크 함수
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+    try {
+      const { exp } = jwtDecode(token);
+      return !exp || Date.now() >= exp * 1000;
+    } catch {
+      return true;
+    }
+  };
 
   // HLS.js 초기화
   useEffect(() => {
@@ -75,11 +89,18 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
       .join(':');
   };
 
-  // 이어보기 팝업: play 이벤트 발생 시에만
+  // 이어보기 팝업 & 토큰 만료 체크: play 이벤트 발생 시에만
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     const onPlay = () => {
+      const token = localStorage.getItem('accessToken');
+      if (isTokenExpired(token)) {
+        alert('로그인이 만료되었습니다. 다시 로그인 해주세요.');
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+        return;
+      }
       if (showResumePrompt) {
         if (window.confirm(`저장된 시청 기록이 있습니다. ${formatTime(lastWatchedTime)}부터 이어서 재생할까요?`)) {
           video.currentTime = lastWatchedTime;
@@ -91,7 +112,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     return () => {
       video.removeEventListener('play', onPlay);
     };
-  }, [showResumePrompt, lastWatchedTime]);
+  }, [showResumePrompt, lastWatchedTime, navigate]);
 
   return (
     <div>

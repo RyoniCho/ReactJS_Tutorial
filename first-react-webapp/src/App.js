@@ -1,3 +1,47 @@
+// axios 인터셉터로 accessToken 자동 부착 및 refreshToken 활용 자동화
+import axios from 'axios';
+import Config from './Config';
+
+// 요청 인터셉터: accessToken 자동 부착
+axios.interceptors.request.use(
+  (config) => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// 응답 인터셉터: 401 발생 시 refreshToken으로 재발급 시도
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const res = await axios.post(`${Config.apiUrl}/api/auth/refresh`, { refreshToken });
+          const { accessToken } = res.data;
+          localStorage.setItem('accessToken', accessToken);
+          originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+          return axios(originalRequest);
+        } catch (refreshErr) {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
+        }
+      } else {
+        localStorage.removeItem('accessToken');
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 
 import RegistInfo from "./RegistInfo";
@@ -22,11 +66,11 @@ function App() {
   const [loginRole, setLoginRole] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
+        const accessToken = localStorage.getItem('accessToken');
         const nsfwToggle= localStorage.getItem("nsfwtoggle");
-        if (token) {
+        if (accessToken) {
             setIsAuthenticated(true);
-            const { role } = jwtDecode(token);
+            const { role } = jwtDecode(accessToken);
             setLoginRole(role);
         }
         if(nsfwToggle)
@@ -65,7 +109,7 @@ function App() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
         setIsAuthenticated(false);
     };
 

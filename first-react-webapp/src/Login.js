@@ -16,11 +16,15 @@ const Login = ({ onLogin }) => {
         e.preventDefault();
         try {
             console.log("HandleLogin - "+username +"/"+password);
-            const res = await axios.post(`${Config.apiUrl}/api/auth/login`,{username,password});
-            const { role } = jwtDecode(res.data.token);
-            localStorage.setItem('token', res.data.token);
+
+            const res = await axios.post(`${Config.apiUrl}/api/auth/login`, { username, password });
+            // 서버에서 accessToken, refreshToken 반환
+            const { accessToken, refreshToken } = res.data;
+            const { role } = jwtDecode(accessToken);
+            localStorage.setItem('accessToken', accessToken);
+            localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('role', role);
-            console.log('role:'+role);
+            console.log('role:' + role);
 
             onLogin(role);
             navigate('/'); 
