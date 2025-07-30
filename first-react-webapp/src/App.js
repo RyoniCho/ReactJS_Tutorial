@@ -111,6 +111,8 @@ function App() {
 
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setLoginRole(null);
         setIsAuthenticated(false);
     };
 
