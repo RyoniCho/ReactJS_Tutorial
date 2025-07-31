@@ -1,10 +1,6 @@
 // axios 인터셉터로 accessToken 자동 부착 및 refreshToken 활용 자동화
 import axios from 'axios';
 import Config from './Config';
-
-
-
-
 import RegistInfo from "./RegistInfo";
 import AMovieList from './AMovieList';
 import AMovieDetail from "./AMoiveDetail";
@@ -16,6 +12,7 @@ import Login from "./Login";
 import { useLocation } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import AdminPage from './AdminPage';
+import { useNavigate } from 'react-router-dom';
 
 // 요청 인터셉터: accessToken 자동 부착
 axios.interceptors.request.use(
@@ -66,6 +63,8 @@ function App() {
   const [scrollPositions, setScrollPositions] = useState({});
   const [loginRole, setLoginRole] = useState(null);
 
+  const navigate = useNavigate();
+
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
         const nsfwToggle= localStorage.getItem("nsfwtoggle");
@@ -114,6 +113,8 @@ function App() {
         localStorage.removeItem('refreshToken');
         setLoginRole(null);
         setIsAuthenticated(false);
+        navigate('/'); // 로그아웃 후 홈으로 이동
+        
     };
 
     const handleToggle = () =>{
