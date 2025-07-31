@@ -55,14 +55,14 @@ axios.interceptors.response.use(
   }
 );
 
-function App() {
 
+function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isNSFWContentBlured,setIsNSFWContentBlured] = useState(true);
+  const [isNSFWContentBlured, setIsNSFWContentBlured] = useState(true);
   const location = useLocation();
   const [scrollPositions, setScrollPositions] = useState({});
   const [loginRole, setLoginRole] = useState(null);
-
+  const [logoutTrigger, setLogoutTrigger] = useState(0); // 로그아웃 트리거
   const navigate = useNavigate();
 
     useEffect(() => {
@@ -108,13 +108,14 @@ function App() {
         setLoginRole(_loginRole);
     };
 
+
     const handleLogout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         setLoginRole(null);
         setIsAuthenticated(false);
-        navigate('/'); // 로그아웃 후 홈으로 이동
-        
+        setLogoutTrigger(prev => prev + 1); // 트리거 증가
+        navigate('/'); // 홈으로 이동
     };
 
     const handleToggle = () =>{
@@ -152,7 +153,7 @@ function App() {
                 
                 
                 <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole}/>} />
+                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger}/>} />
                     <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                     <Route path="/add" element={<RegistInfo/>} />
                     <Route path="edit/:id" element={<EditMovie/>}/>

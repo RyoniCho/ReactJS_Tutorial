@@ -8,7 +8,7 @@ import OptionBar from './OptionBar';
 import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
 
-const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}) => {
+const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,logoutTrigger}) => {
 
     const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
@@ -28,13 +28,24 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}
     const navigate = useNavigate(); 
 
 
+
     useEffect(() => {
         const initialFilter = getInitialFilterCachedValue();
         fetchActors();
         fetchMovies('', initialFilter, 1, pageSize);
         setInitialFetch(true);
-
     }, []);
+
+    // 로그아웃 트리거가 바뀌면 목록 초기화 및 재조회
+    useEffect(() => {
+        if (initialFetch) {
+            setMovies([]);
+            setCurrentPage(1);
+            const initialFilter = getInitialFilterCachedValue();
+            fetchMovies('', initialFilter, 1, pageSize);
+        }
+        // eslint-disable-next-line
+    }, [logoutTrigger]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -194,6 +205,12 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}
                 console.log("fetch Movie -> data is null");
             }
         } catch (error) {
+            // 401 등 에러 발생 시 목록 비우고 홈으로 이동
+            if (error && error.message && error.message.includes('Failed to fetch movies')) {
+                setMovies([]);
+                setHasMore(false);
+                navigate('/');
+            }
             console.error('Error fetching movies:', error);
         } finally {
             setIsLoading(false);
@@ -236,10 +253,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole}
         }
     };
 
-    const handleUnauthorized=()=> {
-        handleLogout();
-        navigate('/login'); // 로그인 페이지로 리디렉션
-    }
+    const handleUnauthorized = () => {
+        setMovies([]);
+        setHasMore(false);
+        navigate('/'); // 홈으로 이동
+    };
 
     const handleSearch = (e) => {
         setSearchTerm(e.target.value);
