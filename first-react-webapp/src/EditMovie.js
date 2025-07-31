@@ -21,8 +21,8 @@ function EditMovie() {
         releaseDate: Date.now(),
         category:'Unknown',
         mainMovie:'',
-        mainMovieSub:''
-        
+        mainMovieSub:'',
+        trailer:''
         
     });
 
@@ -136,6 +136,10 @@ function EditMovie() {
             <label>
                 Release Date:
                 <input type="date" name="releaseDate" value={movie.releaseDate} onChange={handleChange} />
+            </label>
+            <label>
+                Trailer Movie Path:
+                <input type="text" name="trailer" value={movie.trailer} onChange={handleChange} />
             </label>
             <label>
                 Main Movie Path:
