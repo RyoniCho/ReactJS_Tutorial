@@ -45,7 +45,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
 
   // 시청 기록 조회
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token || !movieId) return;
     const fetchWatchHistory = async () => {
       try {
@@ -64,7 +64,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
 
   // 일정 간격마다 재생 위치 저장
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (!token || !movieId) return;
     const interval = setInterval(() => {
       const video = videoRef.current;
