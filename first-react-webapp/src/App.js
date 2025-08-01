@@ -135,7 +135,7 @@ function App() {
    
     // <Router>
             <div className="app">
-                <h1>Control-Room Collection</h1>
+                <h1>Control-Room</h1>
                  {/* 토글 버튼 */}
                  <fieldset>
                     <label>
