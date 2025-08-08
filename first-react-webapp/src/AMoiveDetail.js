@@ -25,7 +25,11 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             try {
                 const url = `${Config.apiUrl}/api/movies/${id}`;
                 console.log(url)
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+                });
                 console.log("AmovieDetail Response:"+response)
                 const data = await response.json();
                 setMovie(data);
