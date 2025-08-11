@@ -28,8 +28,13 @@ function EditMovie() {
 
     useEffect(() => {
         // 서버에서 기존 영화 정보를 가져와서 상태를 업데이트
-       
-        fetch(url)
+        const accessToken = localStorage.getItem('accessToken');
+        fetch(url,
+            {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                }
+            })
             .then(response => response.json())
             .then(data => setMovie(data))
             .catch(err => console.error(err));
