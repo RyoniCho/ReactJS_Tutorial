@@ -35,6 +35,9 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                 setMovie(data);
             } catch (error) {
                 console.error('Error fetching movie:', error);
+                alert('정보를 불러오지 못하였습니다. 홈으로 돌아갑니다.');
+                setMovie(null);
+                navigate('/');
             }
         };
 
