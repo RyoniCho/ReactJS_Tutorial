@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import axios from 'axios';
@@ -28,17 +26,20 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (Hls.isSupported()) {
+
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    if (isSafari && video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', () => {
+        console.log("Video ready to play (Safari native HLS).");
+      });
+    } else if (Hls.isSupported()) {
       const hls = new Hls();
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log("Video ready to play.");
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = videoSrc;
-      video.addEventListener('loadedmetadata', () => {
-        console.log("Video ready to play.");
+        console.log("Video ready to play (HLS.js).");
       });
     }
   }, [videoSrc]);
