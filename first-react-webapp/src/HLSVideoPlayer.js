@@ -116,7 +116,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
 
   return (
     <div>
-      <video ref={videoRef} id="my-video" controls width="100%">
+      <video ref={videoRef} id="my-video" controls width="100%" playsInline>
         {
           (subSrc && subSrc.includes(".vtt")) ? <track kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
         }
