@@ -28,7 +28,8 @@ function RegistInfo()
     //Category
     const [selectedCategory,setSelectedCategory]=useState('');
 
-    //Extra Image Urls
+    //Extra Images
+    const [extraImage, setExtraImage] = useState([]);
     const [urlsExtraImage, setUrlsExtraImage] = useState([]);
 
     //Trailer Url
@@ -75,7 +76,9 @@ function RegistInfo()
         }
     };
 
-   
+   const handleExtraImageFiles = (e) => {
+        setExtraImage(prev => [...prev, ...Array.from(e.target.files)]);
+    };
 
 
     const checkSerialNumberExists = async (serialNumber) => {
@@ -170,6 +173,7 @@ function RegistInfo()
         formData.append('urlTrailer',urlTrailer);
         formData.append('urlsExtraImage',urlsExtraImage);
         formData.append('mainMoviePath', mainMoviePath);
+        formData.append('extraImage', extraImage);
 
         setIsUploading(true);
         setUploadProgress(0);
@@ -302,7 +306,12 @@ function RegistInfo()
                         />)
                     }
 
-                    {(urlsExtraImage.length>0) ? <ExtraImageSlider images={urlsExtraImage}/> : <></>}
+                    {(urlsExtraImage.length>0) ? <ExtraImageSlider images={urlsExtraImage}/> : 
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleExtraImageFiles} />}
                     
                 </div>
                 <div>
