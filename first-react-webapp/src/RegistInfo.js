@@ -29,7 +29,7 @@ function RegistInfo()
     const [selectedCategory,setSelectedCategory]=useState('');
 
     //Extra Images
-    const [extraImage, setExtraImage] = useState(null);
+    const [extraImage, setExtraImage] = useState([]);
     const [urlsExtraImage, setUrlsExtraImage] = useState([]);
 
     //Trailer Url
