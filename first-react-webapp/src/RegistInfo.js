@@ -177,7 +177,7 @@ function RegistInfo()
         //formData.append('extraImage', extraImage);
         if(extraImage && extraImage.length>0)
         {
-            extraImageFiles.forEach(file => {
+            extraImage.forEach(file => {
             formData.append('extraImage', file);
             });
         }
