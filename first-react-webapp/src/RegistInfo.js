@@ -29,7 +29,7 @@ function RegistInfo()
     const [selectedCategory,setSelectedCategory]=useState('');
 
     //Extra Images
-    const [extraImage, setExtraImage] = useState([]);
+    const [extraImage, setExtraImage] = useState(null);
     const [urlsExtraImage, setUrlsExtraImage] = useState([]);
 
     //Trailer Url
@@ -173,7 +173,18 @@ function RegistInfo()
         formData.append('urlTrailer',urlTrailer);
         formData.append('urlsExtraImage',urlsExtraImage);
         formData.append('mainMoviePath', mainMoviePath);
-        formData.append('extraImage', extraImage);
+
+        //formData.append('extraImage', extraImage);
+        if(extraImage && extraImage.length>0)
+        {
+            extraImageFiles.forEach(file => {
+            formData.append('extraImage', file);
+            });
+        }
+        else{
+            formData.append('extraImage', null);
+        }
+        
 
         setIsUploading(true);
         setUploadProgress(0);
