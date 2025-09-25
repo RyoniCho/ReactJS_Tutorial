@@ -31,6 +31,10 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                 }
                 });
                 console.log("AmovieDetail Response:"+response)
+                if (!response.ok) 
+                {
+                     throw new Error('Failed to fetch movie');
+                }
                 const data = await response.json();
                 setMovie(data);
             } catch (error) {
