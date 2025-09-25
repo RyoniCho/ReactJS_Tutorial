@@ -83,7 +83,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
             </div>
-            {(movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)} blur={isNSFWContentBlured}/> : <></>}
+            {(movie.extraImage && movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)} blur={isNSFWContentBlured}/> : <></>}
             
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
