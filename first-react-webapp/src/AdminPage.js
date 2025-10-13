@@ -1,6 +1,7 @@
 import React, { useEffect,useState } from 'react';
 import axios from 'axios';
 import Config from './Config';
+import { Link } from 'react-router-dom';
 
 const AdminPage = () => {
   const [username, setUsername] = useState('');
@@ -69,7 +70,10 @@ const AdminPage = () => {
             <tr key={log._id}>
               <td>{log.userId?.username || '-'}</td>
               <td>{log.action}</td>
-              <td>{log.details}</td>
+              <td>
+                {log.targetId ? 
+                <Link to={`/movies/${log.targetId}`}>{log.details}</Link> : (log.details)}
+              </td>
               <td>{new Date(log.timestamp).toLocaleString()}</td>
             </tr>
           ))}
