@@ -342,7 +342,6 @@ function RegistInfo()
                         <input
                         type="file"
                         onChange={(e) => setTrailer(e.target.files[0])}
-                        required
                     />
                         )
                     }
