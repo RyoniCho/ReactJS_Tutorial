@@ -7,6 +7,8 @@ import axios from 'axios';
 import OptionBar from './OptionBar';
 import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
+import fourKIcon from './Icons/4k.svg'
+import fullhdIcon from './Icons/fullhd.svg'
 
 const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,logoutTrigger}) => {
 
@@ -405,10 +407,14 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
     const ShowOwnedType = (plexRegistered, mainMovie) => {
         const hasWeb = mainMovie && typeof mainMovie === 'object' && Object.keys(mainMovie).length > 0;
+        const has4K = mainMovie && typeof mainMovie === 'object' && (mainMovie['4k'] || mainMovie['2160p']);
+        const hasFullHD = mainMovie && typeof mainMovie === 'object' && mainMovie['1080p'];
         return (
             <div>
                 {plexRegistered ? <img src={plexIcon} className="icon-small" /> : null}
                 {hasWeb ? <img src={webIcon} className="icon-small" /> : null}
+                {has4K ? <img src={fourKIcon} className="icon-small" title="4K" /> : null}
+                {hasFullHD ? <img src={fullhdIcon} className="icon-small" title="FullHD" /> : null}
             </div>
         );
     }

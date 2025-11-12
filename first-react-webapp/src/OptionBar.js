@@ -42,6 +42,8 @@ function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, s
                     <option value="all">All</option>
                     <option value="plex">Owned(Plex)</option>
                     <option value="web">Owned(Web)</option>
+                    <option value="web4k">Owned(Web 4K)</option>
+                    <option value="web1080p">Owned(Web FullHD)</option>
                     <option value="false">Not Owned</option>
                 </select>
             
