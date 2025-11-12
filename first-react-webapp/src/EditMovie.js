@@ -4,41 +4,51 @@ import Config from './Config';
 import axios from 'axios';
 import "./Styles/EditMovie.css"
 
+
 function EditMovie() {
-    const { id } = useParams();  // URL에서 영화 ID를 가져옴
+    const { id } = useParams();
     const navigate = useNavigate();
     const url = `${Config.apiUrl}/api/movies/${id}`;
     const [actors, setActors] = useState([]);
-    
+
+    // mainMoviePaths: { '720p': '', '1080p': '', '4k': '' }
+    const [mainMoviePaths, setMainMoviePaths] = useState({ '720p': '', '1080p': '', '4k': '' });
 
     const [movie, setMovie] = useState({
         title: '',
         description: '',
         actor: '',
         serialNumber: '',
-        subscriptExist:false,
+        subscriptExist: false,
         plexRegistered: false,
         releaseDate: Date.now(),
-        category:'Unknown',
-        mainMovie:'',
-        mainMovieSub:'',
-        trailer:''
-        
+        category: 'Unknown',
+        mainMovie: {},
+        mainMovieSub: '',
+        trailer: ''
     });
 
     useEffect(() => {
         // 서버에서 기존 영화 정보를 가져와서 상태를 업데이트
         const accessToken = localStorage.getItem('accessToken');
-        fetch(url,
-            {
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`,
+        fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                setMovie(data);
+                // mainMovie가 객체(Map)라면 상태로 변환
+                if (data.mainMovie && typeof data.mainMovie === 'object') {
+                    setMainMoviePaths({
+                        '720p': data.mainMovie['720p'] || '',
+                        '1080p': data.mainMovie['1080p'] || '',
+                        '4k': data.mainMovie['4k'] || ''
+                    });
                 }
             })
-            .then(response => response.json())
-            .then(data => setMovie(data))
             .catch(err => console.error(err));
-            
         fetchActors();
     }, [id]);
 
@@ -71,26 +81,28 @@ function EditMovie() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem('accessToken'); // 로컬 스토리지에서 토큰 가져오기
+        const token = localStorage.getItem('accessToken');
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // Authorization 헤더에 JWT 토큰 포함
+                'Authorization': `Bearer ${token}`,
                 withCredentials: true
             },
         };
-        
-        try{
-            const res = await axios.put(url,movie,config);
-            navigate(`/movies/${id}`);  // 업데이트 후 상세 페이지로 이동
-        }
 
-        catch (err) {
-          
-            console.log(err)
+        // mainMovie를 객체로 movie에 반영
+        const updatedMovie = {
+            ...movie,
+            mainMovie: mainMoviePaths
+        };
+
+        try {
+            await axios.put(url, updatedMovie, config);
+            navigate(`/movies/${id}`);
+        } catch (err) {
+            console.log(err);
             alert('Edit Info Failed');
         }
-
     };
 
     return (
@@ -146,10 +158,13 @@ function EditMovie() {
                 Trailer Movie Path:
                 <input type="text" name="trailer" value={movie.trailer} onChange={handleChange} />
             </label>
-            <label>
-                Main Movie Path:
-                <input type="text" name="mainMovie" value={movie.mainMovie} onChange={handleChange} />
-            </label>
+
+            <label>Main Movie (화질별 경로)</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 12 }}>
+                <input type="text" placeholder="720p 경로" value={mainMoviePaths['720p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '720p': e.target.value }))} />
+                <input type="text" placeholder="1080p 경로" value={mainMoviePaths['1080p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '1080p': e.target.value }))} />
+                <input type="text" placeholder="4K 경로" value={mainMoviePaths['4k']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '4k': e.target.value }))} />
+            </div>
             
             <button type="submit">Save Changes</button>
         </form>

@@ -13,6 +13,17 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const [loginRole, setLoginRole] = useState(null);
     const navigate = useNavigate();
 
+    const [selectedQuality, setSelectedQuality] = useState('');
+    // availableQualities의 첫 번째 값으로 selectedQuality 자동 설정
+    useEffect(() => {
+        if (movie && movie.mainMovie) {
+            const qualities = Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]);
+            if (qualities.length > 0 && !qualities.includes(selectedQuality)) {
+                setSelectedQuality(qualities[0]);
+            }
+        }
+    }, [movie]);
+
     useEffect(() => {
 
         const accessToken = localStorage.getItem('accessToken');
@@ -80,6 +91,9 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     }
 
     if (!movie) return <div>Loading...</div>;
+    
+    const availableQualities = movie.mainMovie ? Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]) : [];
+   
 
     return (
         <div className="movie-detail">
@@ -121,8 +135,26 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             </div>
             <div>
             
-            {(movie.mainMovie!=='') ? <h4>Main Movie</h4> : <></>}
-            {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} subSrc={`${Config.apiUrl}/api/${movie.mainMovieSub}`} movieId={`${id}`}/> : <></>}
+            {/* {(movie.mainMovie!=='') ? <h4>Main Movie</h4> : <></>}
+            {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} subSrc={`${Config.apiUrl}/api/${movie.mainMovieSub}`} movieId={`${id}`}/> : <></>} */}
+            {availableQualities.length > 0 && (
+                <>
+                    <h4>Main Movie</h4>
+                    <div style={{ marginBottom: 8 }}>
+                        <label>화질 선택: </label>
+                        <select value={selectedQuality} onChange={e => setSelectedQuality(e.target.value)}>
+                            {availableQualities.map(q => (
+                                <option key={q} value={q}>{q}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <HLSVideoPlayer
+                        videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie[selectedQuality]}&resolution=${selectedQuality}`}
+                        subSrc={movie.mainMovieSub ? `${Config.apiUrl}/api/${movie.mainMovieSub}` : ''}
+                        movieId={`${id}`}
+                    />
+                </>
+            )}
             </div>
            
         </div>

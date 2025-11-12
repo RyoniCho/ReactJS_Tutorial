@@ -5,20 +5,21 @@ import Config from './Config'
 import axios from 'axios';
 import ExtraImageSlider from "./ExtraImageSlider";
 
-function RegistInfo()
-{
+
+function RegistInfo() {
     const [serialNumber, setSerialNumber] = useState('');
     const [title, setTitle] = useState('');
     const [image, setImage] = useState(null);
-    const [urlImage,setUrlImage] =useState('');
+    const [urlImage, setUrlImage] = useState('');
     const [trailer, setTrailer] = useState(null);
     const [plexRegistered, setPlexRegistered] = useState(false);
     const [subscription, setSubscription] = useState(false);
     const [description, setDescription] = useState('');
-    const [releaseDate,setReleaseDate] = useState(Date.now);
+    const [releaseDate, setReleaseDate] = useState(Date.now);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
-    const [mainMoviePath,setMainMoviePath] =useState('');
+    // mainMoviePaths: { '720p': '', '1080p': '', '4k': '' }
+    const [mainMoviePaths, setMainMoviePaths] = useState({ '720p': '', '1080p': '', '4k': '' });
 
     //Actors
     const [actors, setActors] = useState([]);
@@ -26,14 +27,14 @@ function RegistInfo()
     const [newActor, setNewActor] = useState('');
 
     //Category
-    const [selectedCategory,setSelectedCategory]=useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
 
     //Extra Images
     const [extraImage, setExtraImage] = useState([]);
     const [urlsExtraImage, setUrlsExtraImage] = useState([]);
 
     //Trailer Url
-    const [urlTrailer,setUrlTrailer] = useState('');
+    const [urlTrailer, setUrlTrailer] = useState('');
 
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -169,10 +170,12 @@ function RegistInfo()
         formData.append('releaseDate', releaseDate);
         formData.append('category',(selectedCategory==="")?"Unknown":selectedCategory);
 
-        formData.append('urlImage',urlImage);
-        formData.append('urlTrailer',urlTrailer);
-        formData.append('urlsExtraImage',urlsExtraImage);
-        formData.append('mainMoviePath', mainMoviePath);
+
+    formData.append('urlImage', urlImage);
+    formData.append('urlTrailer', urlTrailer);
+    formData.append('urlsExtraImage', urlsExtraImage);
+    // mainMovie를 JSON 문자열로 전송
+    formData.append('mainMovie', JSON.stringify(mainMoviePaths));
 
         //formData.append('extraImage', extraImage);
         if(extraImage && extraImage.length>0)
@@ -207,7 +210,7 @@ function RegistInfo()
             setTitle('');
             setImage(null);
             setTrailer(null);
-            setMainMoviePath('')
+            setMainMoviePaths({ '720p': '', '1080p': '', '4k': '' });
 
             navigate('/'); // 메인 페이지로 이동
         }
@@ -347,12 +350,14 @@ function RegistInfo()
                     }
                     
                 </div>
+
                 <div>
-                    <label>Main Movie</label>
-                    {
-                        <input type="text" placeholder="Type Main Movie Path.." value={mainMoviePath}
-                        onChange={(e) => setMainMoviePath(e.target.value)}/>
-                    }
+                    <label>Main Movie (화질별 경로)</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <input type="text" placeholder="720p 경로" value={mainMoviePaths['720p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '720p': e.target.value }))} />
+                        <input type="text" placeholder="1080p 경로" value={mainMoviePaths['1080p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '1080p': e.target.value }))} />
+                        <input type="text" placeholder="4K 경로" value={mainMoviePaths['4k']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '4k': e.target.value }))} />
+                    </div>
                 </div>
                 <div>
                     <label>Release Date:</label>
