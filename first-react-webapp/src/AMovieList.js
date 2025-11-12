@@ -290,8 +290,15 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         .filter(movie => selectedActor ? movie.actor === selectedActor : true)
         .filter(movie => {
             if (owned === 'plex') return movie.plexRegistered === true;
-            if (owned === 'web') return movie.mainMovie!=='';
-            if (owned === 'false') return movie.plexRegistered === false && movie.mainMovie==='';
+            if (owned === 'web') {
+                // mainMovie가 object/map이고, 키가 1개 이상이면 true
+                return movie.mainMovie && typeof movie.mainMovie === 'object' && Object.keys(movie.mainMovie).length > 0;
+            }
+            if (owned === 'false') {
+                // plexRegistered가 false이고 mainMovie가 없거나 빈 객체
+                const isMainMovieEmpty = !movie.mainMovie || (typeof movie.mainMovie === 'object' && Object.keys(movie.mainMovie).length === 0);
+                return movie.plexRegistered === false && isMainMovieEmpty;
+            }
             return true;
         })
         .filter(movie => {
