@@ -403,9 +403,14 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         handleFilterChange(newFilters);
     }
 
-    const ShowOwnedType=(plexRegistered, mainMovie)=>{
-        return (<div>{plexRegistered? <img src = {plexIcon} className="icon-small"/>:<></>} {(mainMovie !=='') ? <img src = {webIcon} className="icon-small"/>: <></>}</div>)
-       
+    const ShowOwnedType = (plexRegistered, mainMovie) => {
+        const hasWeb = mainMovie && typeof mainMovie === 'object' && Object.keys(mainMovie).length > 0;
+        return (
+            <div>
+                {plexRegistered ? <img src={plexIcon} className="icon-small" /> : null}
+                {hasWeb ? <img src={webIcon} className="icon-small" /> : null}
+            </div>
+        );
     }
 
     return (
@@ -445,7 +450,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                             </div>
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
-                                <h4>보유여부: {(!movie.plexRegistered&&movie.mainMovie==='') ? 'X': (ShowOwnedType(movie.plexRegistered,movie.mainMovie)) }</h4>
+                                <h4>보유여부: {
+                                    (!movie.plexRegistered && (!movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0))
+                                        ? 'X'
+                                        : ShowOwnedType(movie.plexRegistered, movie.mainMovie)
+                                }</h4>
                                 <h4>자막유뮤: {movie.subscriptExist ? 'O':'X'}</h4>
                                 <div className='release-date'>
                                     <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
