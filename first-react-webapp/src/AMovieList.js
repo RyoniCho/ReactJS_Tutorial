@@ -14,6 +14,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
     const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
+    const [totalCount, setTotalCount] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
     const [actors, setActors] = useState([]);
     const [selectedActor, setSelectedActor] = useState('');
@@ -199,18 +200,21 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             }
 
             const data = await response.json();
-            if (data.length > 0) {
-                setMovies(prev => [...prev, ...data]); // 새 데이터 추가
+            // 서버에서 { movies, totalCount } 형태로 반환됨
+            if (data.movies && data.movies.length > 0) {
+                setMovies(prev => [...prev, ...data.movies]); // 새 데이터 추가
                 setHasMore(true);
             } else {
                 setHasMore(false);
                 console.log("fetch Movie -> data is null");
             }
+            setTotalCount(data.totalCount || 0);
         } catch (error) {
             // 401 등 에러 발생 시 목록 비우고 홈으로 이동
             if (error && error.message && error.message.includes('Failed to fetch movies')) {
                 setMovies([]);
                 setHasMore(false);
+                setTotalCount(0);
                 navigate('/');
             }
             console.error('Error fetching movies:', error);
@@ -437,6 +441,15 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
          />
         <div className="movie-list">
+            <div className="movie-list-header">
+                <span className="total-count-label">
+                    <svg className="total-count-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="10" cy="10" r="10" fill="#1976d2"/>
+                        <text x="10" y="15" textAnchor="middle" fontSize="12" fill="#fff" fontWeight="bold">#</text>
+                    </svg>
+                    <b>Totals</b> <span className="total-count-number">{totalCount}</span> Results
+                </span>
+            </div>
             <input
                 type="text"
                 value={searchTerm}
@@ -451,7 +464,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                         <div className="movie-info">
                             <p>{movie.serialNumber}</p>
                         </div>
-                            <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
+                            <div className={`${isNSFWContentBlured ? 'blur' : ''}`}> 
                             <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
                             </div>
                             <div className="movie-info">
