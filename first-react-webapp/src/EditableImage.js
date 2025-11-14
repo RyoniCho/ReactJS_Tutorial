@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Config from './Config';
 
 const getPreviewUrl = (src) => {
+    console.log("EditableImage getPreviewUrl src:"+src);
     if (!src) return '';
     if (src.startsWith('http://') || src.startsWith('https://')) return src;
     if (src.startsWith('uploads/')) return `${Config.apiUrl}/${src}`;
