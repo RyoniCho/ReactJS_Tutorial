@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Config from './Config';
 
 const getPreviewUrl = (src) => {
-    console.log("EditableImage getPreviewUrl src:"+src);
     if (!src) return '';
     if (src.startsWith('http://') || src.startsWith('https://')) return src;
-    if (src.startsWith('uploads/')) return `${Config.apiUrl}/${src}`;
+    // 윈도우 경로 구분자도 처리
+    if (src.startsWith('uploads/') || src.startsWith('uploads\\')) {
+        // \를 /로 변환해서 URL로 만듦
+        const normalized = src.replace(/\\/g, '/');
+        return `${Config.apiUrl}/${normalized}`;
+    }
     return src;
 };
 
