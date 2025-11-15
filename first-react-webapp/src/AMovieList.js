@@ -297,12 +297,12 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         .filter(movie => {
             if (owned === 'plex') return movie.plexRegistered === true;
             if (owned === 'web') {
-                // mainMovie가 object/map이고, 키가 1개 이상이면 true
-                return movie.mainMovie && typeof movie.mainMovie === 'object' && Object.keys(movie.mainMovie).length > 0;
+                // mainMovie의 값이 하나라도 있으면 true
+                return movie.mainMovie && typeof movie.mainMovie === 'object' && Object.values(movie.mainMovie).some(v => v);
             }
             if (owned === 'false') {
-                // plexRegistered가 false이고 mainMovie가 없거나 빈 객체
-                const isMainMovieEmpty = !movie.mainMovie || (typeof movie.mainMovie === 'object' && Object.keys(movie.mainMovie).length === 0);
+                // plexRegistered가 false이고 mainMovie의 모든 값이 비어있으면 미보유
+                const isMainMovieEmpty = !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v);
                 return movie.plexRegistered === false && isMainMovieEmpty;
             }
             return true;
@@ -410,9 +410,16 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     }
 
     const ShowOwnedType = (plexRegistered, mainMovie) => {
-        const hasWeb = mainMovie && typeof mainMovie === 'object' && Object.keys(mainMovie).length > 0;
-        const has4K = mainMovie && typeof mainMovie === 'object' && (mainMovie['4k'] || mainMovie['2160p']);
-        const hasFullHD = mainMovie && typeof mainMovie === 'object' && mainMovie['1080p'];
+        // mainMovie의 값이 모두 비어있으면 보유X로 간주
+        const isAllEmpty = !mainMovie || typeof mainMovie !== 'object' || Object.keys(mainMovie).length === 0 || Object.values(mainMovie).every(v => !v);
+        if (plexRegistered && isAllEmpty) {
+            // plex만 보유, web 없음
+            return <img src={plexIcon} className="icon-small" />;
+        }
+        if (isAllEmpty) return null;
+        const hasWeb = Object.values(mainMovie).some(v => v);
+        const has4K = mainMovie['4k'] || mainMovie['2160p'];
+        const hasFullHD = mainMovie['1080p'];
         return (
             <div>
                 {plexRegistered ? <img src={plexIcon} className="icon-small" /> : null}
@@ -470,7 +477,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                             <div className="movie-info">
                                 <h3>{movie.title}</h3>
                                 <h4>보유여부: {
-                                    (!movie.plexRegistered && (!movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0))
+                                    (!movie.plexRegistered && (
+                                        !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v)
+                                    ))
                                         ? 'X'
                                         : ShowOwnedType(movie.plexRegistered, movie.mainMovie)
                                 }</h4>
