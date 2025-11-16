@@ -30,6 +30,8 @@ function OptionBar({ isAuthenticated, actors, selectedActor, setSelectedActor, s
                 <select className="option-item" value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
                     <option value="asc">Release Date: Ascending</option>
                     <option value="desc">Release Date: Descending</option>
+                    <option value="createdAsc">Created Date: Ascending</option>
+                    <option value="createdDesc">Created Date: Descending</option>
                 </select>
 
                 <select className="option-item" value={subscriptExist} onChange={e => setSubscriptExist(e.target.value)}>
