@@ -42,13 +42,25 @@ axios.interceptors.response.use(
           originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
           return axios(originalRequest);
         } catch (refreshErr) {
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          if (typeof window.handleLogout === 'function') {
+            alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+            window.handleLogout();
+          } else {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+            window.location.href = '/login';
+          }
         }
       } else {
-        localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        if (typeof window.handleLogout === 'function') {
+          alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+          window.handleLogout();
+        } else {
+          localStorage.removeItem('accessToken');
+          alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);
@@ -103,20 +115,27 @@ function App() {
 
       
 
-    const handleLogin = (_loginRole) => {
-        setIsAuthenticated(true);
-        setLoginRole(_loginRole);
-    };
+  const handleLogin = (_loginRole) => {
+    setIsAuthenticated(true);
+    setLoginRole(_loginRole);
+  };
 
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setLoginRole(null);
+    setIsAuthenticated(false);
+    setLogoutTrigger(prev => prev + 1); // 트리거 증가
+    navigate('/'); // 홈으로 이동
+  };
 
-    const handleLogout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        setLoginRole(null);
-        setIsAuthenticated(false);
-        setLogoutTrigger(prev => prev + 1); // 트리거 증가
-        navigate('/'); // 홈으로 이동
+  // handleLogout을 window에 할당하여 인터셉터에서 접근 가능하게 함
+  useEffect(() => {
+    window.handleLogout = handleLogout;
+    return () => {
+    delete window.handleLogout;
     };
+  }, []);
 
     const handleToggle = () =>{
         
