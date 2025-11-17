@@ -1,9 +1,22 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Config from './Config';
 import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 
+// 초를 시:분:초로 변환
+function formatSeconds(sec) {
+  if (typeof sec !== 'number' || isNaN(sec)) return '-';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return [
+    h > 0 ? String(h).padStart(2, '0') : null,
+    String(m).padStart(2, '0'),
+    String(s).padStart(2, '0')
+  ].filter(Boolean).join(':');
+}
 const LatestWatched = ({ isNSFWContentBlured }) => {
   const [histories, setHistories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +75,7 @@ const LatestWatched = ({ isNSFWContentBlured }) => {
               </div>
               <div className="movie-info">
                 <h3>{h.movieId?.title}</h3>
-                <p>마지막 시청 위치: {h.lastWatchedTime}초</p>
+                <p>마지막 시청 위치: {formatSeconds(h.lastWatchedTime)}</p>
                 <p>업데이트: {new Date(h.updatedAt).toLocaleString()}</p>
               </div>
             </Link>
