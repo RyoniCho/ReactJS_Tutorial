@@ -7,6 +7,7 @@ import AMovieDetail from "./AMoiveDetail";
 import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
 import './Styles/App.css';
 import EditMovie from "./EditMovie";
+import LatestWatched from "./LatestWatched";
 import { useState,useEffect } from "react";
 import Login from "./Login";
 import { useLocation } from 'react-router-dom';
@@ -162,23 +163,25 @@ function App() {
                             <span>NSFW SAFE</span>
                     </label>
                 </fieldset>
-                <nav>
-                    <Link to="/">Home</Link>
-                    {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add Movie</Link> : <></>}
-                    {isAuthenticated && loginRole === "admin" ? <Link to="/admin">AdminPage</Link> : <></>}
-                    {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
-                    (<Link to="/login">Login</Link>)}
-                </nav>
+        <nav>
+          <Link to="/">Home</Link>
+          <Link to="/latest-watched">Continue Watching</Link>
+          {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add Movie</Link> : <></>}
+          {isAuthenticated && loginRole === "admin" ? <Link to="/admin">AdminPage</Link> : <></>}
+          {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
+          (<Link to="/login">Login</Link>)}
+        </nav>
                 
                 
-                <Routes>
-                    <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger}/>} />
-                    <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
-                    <Route path="/add" element={<RegistInfo/>} />
-                    <Route path="edit/:id" element={<EditMovie/>}/>
-                    <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
-                    <Route path="/admin" element={<AdminPage/>}/>
-                </Routes>
+        <Routes>
+          <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger}/>} />
+                    <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} />} />
+          <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
+          <Route path="/add" element={<RegistInfo/>} />
+          <Route path="edit/:id" element={<EditMovie/>}/>
+          <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
+          <Route path="/admin" element={<AdminPage/>}/>
+        </Routes>
             </div>
         // </Router>
   )
