@@ -188,7 +188,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                             } else {
                                 localStorage.removeItem('accessToken');
                                 localStorage.removeItem('refreshToken');
-                                window.location.href = '/login';
+                                navigate('/login');
                             }
                             return;
                         } else {
@@ -213,7 +213,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                     } else {
                         localStorage.removeItem('accessToken');
                         localStorage.removeItem('refreshToken');
-                        window.location.href = '/login';
+                        navigate('/login');
                     }
                     return;
                 }
@@ -283,7 +283,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const handleUnauthorized = () => {
         setMovies([]);
         setHasMore(false);
-        navigate('/'); // 홈으로 이동
+        navigate('/login'); // 홈이 아니라 로그인 페이지로 이동
     };
 
     const handleSearch = (e) => {
