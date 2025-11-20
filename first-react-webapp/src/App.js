@@ -64,6 +64,21 @@ axios.interceptors.response.use(
         }
       }
     }
+       // 403 Forbidden: 세션 만료/권한 없음 등 사용자 안내
+   if (error.response && error.response.status === 403) {
+     alert('접근 권한이 없거나 세션이 만료되었습니다. 다시 로그인 해주세요.');
+     if (typeof window.handleLogout === 'function') 
+     {
+        window.handleLogout();
+     } 
+     else 
+    {
+       localStorage.removeItem('accessToken');
+       localStorage.removeItem('refreshToken');
+       window.location.href = '/login';
+     }
+     return Promise.reject(error);
+   }
     return Promise.reject(error);
   }
 );
