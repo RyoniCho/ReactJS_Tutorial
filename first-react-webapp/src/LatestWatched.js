@@ -49,6 +49,12 @@ const LatestWatched = ({ isNSFWContentBlured }) => {
     }
   };
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    const normalizedPath = imagePath.replace(/\\/g, '/');
+    return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+  }
+
   if (loading) return <div>Loading...</div>;
   if (!histories.length) return <div>최근 시청 기록이 없습니다.</div>;
 
@@ -66,20 +72,44 @@ const LatestWatched = ({ isNSFWContentBlured }) => {
       <div className="movies">
         {histories.map(h => (
           <div key={h._id} className="movie-card">
-            <Link to={`/movies/${h.movieId?._id}`} className="movie-link">
-              <div className="movie-info">
-                <p>{h.movieId?.serialNumber}</p>
-              </div>
-              <div className={isNSFWContentBlured ? 'blur' : ''}>
-                <img src={`${Config.apiUrl}/${h.movieId?.image}`} alt={h.movieId?.title} className="movie-thumbnail" />
-              </div>
-              <div className="movie-info">
-                <h3>{h.movieId?.title}</h3>
-                <p>마지막 시청 위치: {formatSeconds(h.lastWatchedTime)}</p>
-                <p>업데이트: {new Date(h.updatedAt).toLocaleString()}</p>
-              </div>
-            </Link>
-            <button className="list-delete-button" onClick={() => handleDelete(h._id)} style={{marginTop:'8px'}}>기록 삭제</button>
+            {/* 1. 배경: 전체 블러 이미지 */}
+            <div 
+                className={`movie-card-blur-bg ${isNSFWContentBlured ? 'blur-strong' : ''}`}
+                style={{ backgroundImage: `url(${getImageUrl(h.movieId?.image)})` }}
+            ></div>
+
+            {/* 2. 컨텐츠 래퍼: 포스터와 정보를 수직으로 배치 */}
+            <div className="movie-card-inner">
+                {/* 시리얼 넘버: 카드 맨 위로 이동 */}
+                <div className="movie-info-top">
+                    <p>{h.movieId?.serialNumber}</p>
+                </div>
+
+                {/* 상단: 선명한 포스터 이미지 (링크 포함) */}
+                <Link to={`/movies/${h.movieId?._id}`} className="movie-poster-link">
+                    <div 
+                        className="movie-poster-clear"
+                        style={{ backgroundImage: `url(${getImageUrl(h.movieId?.image)})` }}
+                    >
+                        {/* NSFW 필터가 켜져있을 때 포스터 자체도 가려야 한다면 여기에 추가 블러 처리 가능 */}
+                        {isNSFWContentBlured && <div className="nsfw-poster-cover"></div>}
+                    </div>
+                </Link>
+
+                {/* 하단: 정보 영역 */}
+                <div className="movie-info-area">
+                    <div className="movie-info-bottom">
+                        <Link to={`/movies/${h.movieId?._id}`} className="movie-title-link">
+                            <h3>{h.movieId?.title}</h3>
+                        </Link>
+                        <h4>마지막 시청: {formatSeconds(h.lastWatchedTime)}</h4>
+                        <div className='release-date'>
+                             <h4>{new Date(h.updatedAt).toLocaleString()} 시청함</h4>
+                        </div>
+                    </div>
+                    <button className="list-delete-button" onClick={() => handleDelete(h._id)}>기록 삭제</button>
+                </div>
+            </div>
           </div>
         ))}
       </div>

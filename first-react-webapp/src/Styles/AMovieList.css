@@ -10,6 +10,7 @@
     --blur-bg-strong-filter: blur(30px) brightness(1.2);
     --info-text-color: #555;
     --release-date-text-color: #777;
+    --nsfw-cover-bg: rgba(255, 255, 255, 0.4); /* Light mode: White overlay */
 }
 
 [data-theme='dark'] {
@@ -22,6 +23,7 @@
     --blur-bg-strong-filter: blur(30px) brightness(0.4);
     --info-text-color: #e0e0e0;
     --release-date-text-color: #bbb;
+    --nsfw-cover-bg: rgba(0, 0, 0, 0.5); /* Dark mode: Black overlay */
 }
 
 .movie-list {
@@ -164,7 +166,7 @@
     width: 100%;
     height: 100%;
     backdrop-filter: blur(30px);
-    background: rgba(0,0,0,0.5);
+    background: var(--nsfw-cover-bg);
 }
 
 .movie-info-area {
