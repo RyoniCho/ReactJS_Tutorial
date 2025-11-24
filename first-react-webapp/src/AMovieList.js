@@ -488,32 +488,53 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             <div className="movies">
                 {movies.map((movie) => (
                     <div key={movie._id} className="movie-card">
-                        <Link to={`/movies/${movie._id}`} className="movie-link">
-                        <div className="movie-info">
-                            <p>{movie.serialNumber}</p>
-                        </div>
-                            <div className={`${isNSFWContentBlured ? 'blur' : ''}`}> 
-                            <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-thumbnail" />
+                        {/* 1. 배경: 전체 블러 이미지 */}
+                        <div 
+                            className={`movie-card-blur-bg ${isNSFWContentBlured ? 'blur-strong' : ''}`}
+                            style={{ backgroundImage: `url(${Config.apiUrl}/${movie.image})` }}
+                        ></div>
+
+                        {/* 2. 컨텐츠 래퍼: 포스터와 정보를 수직으로 배치 */}
+                        <div className="movie-card-inner">
+                            {/* 시리얼 넘버: 카드 맨 위로 이동 */}
+                            <div className="movie-info-top">
+                                <p>{movie.serialNumber}</p>
                             </div>
-                            <div className="movie-info">
-                                <h3>{movie.title}</h3>
-                                <h4>보유여부: {
-                                    (!movie.plexRegistered && (
-                                        !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v)
-                                    ))
-                                        ? 'X'
-                                        : ShowOwnedType(movie.plexRegistered, movie.mainMovie)
-                                }</h4>
-                                <h4>자막유뮤: {movie.subscriptExist ? 'O':'X'}</h4>
-                                <div className='release-date'>
-                                    <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
+
+                            {/* 상단: 선명한 포스터 이미지 (링크 포함) */}
+                            <Link to={`/movies/${movie._id}`} className="movie-poster-link">
+                                <div 
+                                    className="movie-poster-clear"
+                                    style={{ backgroundImage: `url(${Config.apiUrl}/${movie.image})` }}
+                                >
+                                    {/* NSFW 필터가 켜져있을 때 포스터 자체도 가려야 한다면 여기에 추가 블러 처리 가능 */}
+                                    {isNSFWContentBlured && <div className="nsfw-poster-cover"></div>}
                                 </div>
-                              
+                            </Link>
+
+                            {/* 하단: 정보 영역 */}
+                            <div className="movie-info-area">
+                                <div className="movie-info-bottom">
+                                    <Link to={`/movies/${movie._id}`} className="movie-title-link">
+                                        <h3>{movie.title}</h3>
+                                    </Link>
+                                    <h4>보유여부: {
+                                        (!movie.plexRegistered && (
+                                            !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v)
+                                        ))
+                                            ? 'X'
+                                            : ShowOwnedType(movie.plexRegistered, movie.mainMovie)
+                                    }</h4>
+                                    <h4>자막유뮤: {movie.subscriptExist ? 'O':'X'}</h4>
+                                    <div className='release-date'>
+                                        <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
+                                    </div>
+                                </div>
+                                {
+                                    isAuthenticated && loginRole === "admin" ? (<button onClick={() => deleteMovie(movie._id)} className="list-delete-button"> Delete</button>) : (<></>)
+                                }
                             </div>
-                        </Link>
-                        {
-                            isAuthenticated&&loginRole==="admin"? (<button onClick={() => deleteMovie(movie._id)} className="list-delete-button"> Delete</button>):(<></>)
-                        }
+                        </div>
                     </div>
                 ))}
                 {isLoading && (

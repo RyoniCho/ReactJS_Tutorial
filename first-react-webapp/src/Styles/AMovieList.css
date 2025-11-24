@@ -1,5 +1,29 @@
 /* Modern Theme for Movie List (Variables defined in App.css) */
 
+:root {
+    --card-bottom-grad: linear-gradient(to top, rgba(255,255,255,0.95) 20%, rgba(255,255,255,0.6) 60%, transparent 100%);
+    --card-top-grad: transparent;
+    --card-text-color: #333;
+    --serial-number-color: #333;
+    --serial-text-shadow: 0 0 10px rgba(255,255,255,0.9), 0 0 4px rgba(255,255,255,1);
+    --blur-bg-filter: blur(20px) brightness(1.05);
+    --blur-bg-strong-filter: blur(30px) brightness(1.2);
+    --info-text-color: #555;
+    --release-date-text-color: #777;
+}
+
+[data-theme='dark'] {
+    --card-bottom-grad: linear-gradient(to top, rgba(0,0,0,0.95) 20%, rgba(0,0,0,0.7) 60%, transparent 100%);
+    --card-top-grad: transparent;
+    --card-text-color: #fff;
+    --serial-number-color: #fff;
+    --serial-text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,1);
+    --blur-bg-filter: blur(20px) brightness(0.6);
+    --blur-bg-strong-filter: blur(30px) brightness(0.4);
+    --info-text-color: #e0e0e0;
+    --release-date-text-color: #bbb;
+}
+
 .movie-list {
     padding: 20px;
     margin: 0 auto;
@@ -72,98 +96,167 @@
     border: 1px solid var(--nav-border);
     border-radius: 16px;
     overflow: hidden;
-    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s, background-color 0.3s, border-color 0.3s;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    position: relative;
+    color: var(--card-text-color);
+    display: flex;
+    flex-direction: column;
+    /* aspect-ratio 제거: 컨텐츠에 따라 높이 유동적 혹은 고정 높이 사용 */
+    height: 100%; 
+    min-height: 420px; /* 포스터 + 정보 영역 확보 */
+}
+
+.movie-card-blur-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: var(--blur-bg-filter); /* 기본적으로 블러 처리된 배경 */
+    transform: scale(1.1); /* 블러 가장자리 깨짐 방지 */
+    z-index: 0;
+    transition: filter 0.3s ease;
+}
+
+.movie-card-blur-bg.blur-strong {
+    filter: var(--blur-bg-strong-filter); /* NSFW 시 더 강한 블러 */
+}
+
+.movie-card-inner {
+    position: relative;    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.movie-poster-link {
+    display: block;
+    width: 100%;
+    padding-top: 150%; /* 2:3 비율 유지 (100 / 2 * 3 = 150%) */
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0; /* 포스터 영역 줄어들지 않게 */
+}
+
+.movie-poster-clear {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+.nsfw-poster-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(30px);
+    background: rgba(0,0,0,0.5);
+}
+
+.movie-info-area {
+    flex-grow: 1;
+    background: var(--card-bottom-grad); /* 반투명 그라데이션 배경으로 자연스럽게 블러 연결 */
+    padding: 15px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 4px 10px var(--shadow-color);
-    position: relative;
+}
+
+.movie-card:hover .movie-poster-clear {
+    transform: scale(1.03);
 }
 
 .movie-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 30px var(--shadow-color);
     border-color: var(--accent-color);
-    z-index: 1;
 }
 
-.movie-link {
+.movie-title-link {
     text-decoration: none;
     color: inherit;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
 }
 
-.movie-thumbnail {
+.movie-info-top {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    aspect-ratio: 2 / 3; /* Standard movie poster ratio */
-    object-fit: cover;
-    object-position: right center;
-    transition: filter 0.3s;
-}
-
-.movie-card:hover .movie-thumbnail {
-    filter: brightness(1.1);
-}
-
-.movie-info {
+    text-align: left;
     padding: 15px;
-    text-align: left; /* Modern left align */
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    z-index: 10;
+    background: transparent;
+    pointer-events: none;
 }
 
-.movie-info p {
+.movie-info-top p {
     margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.85em;
-    font-weight: 500;
-    opacity: 0.7;
+    font-size: 1.0em;
+    font-weight: 700;
+    color: var(--serial-number-color); /* 시리얼 넘버 강조 */
+    text-shadow: var(--serial-text-shadow);
+    letter-spacing: 0.5px;
 }
 
-.movie-info h3 {
-    margin: 5px 0;
+.movie-info-bottom {
+    text-align: left;
+}
+
+.movie-info-bottom h3 {
+    margin: 0 0 8px 0;
     font-size: 1.1em;
     font-weight: 600;
     line-height: 1.4;
-    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limit title to 2 lines */
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
 }
 
-.movie-info h4 {
-    margin: 0;
+.movie-info-bottom h4 {
+    margin: 4px 0;
     font-size: 0.9em;
-    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 6px;
+    color: var(--info-text-color);
 }
 
 .release-date h4 {
-    color: var(--release-date-color);
+    color: var(--release-date-text-color);
     font-size: 0.85em;
-    margin-top: auto; /* Push to bottom if flex */
+    margin-top: 8px;
 }
 
 .list-delete-button {
-    background-color: rgba(207, 102, 121, 0.1);
+    background-color: rgba(207, 102, 121, 0.2);
     color: var(--danger-color);
-    padding: 12px;
+    padding: 10px;
     border: none;
     cursor: pointer;
     text-align: center;
     transition: all 0.3s ease;
-    border-radius: 0;
+    border-radius: 8px;
     font-weight: 600;
     letter-spacing: 0.5px;
     width: 100%;
+    border: 1px solid rgba(207, 102, 121, 0.3);
+    margin-top: 15px;
 }
 
 .list-delete-button:hover {
@@ -182,7 +275,7 @@
     vertical-align: middle;
     opacity: 0.9;
     transition: opacity 0.2s;
-    filter: var(--icon-filter);
+    filter: var(--icon-filter); /* Make icons white for dark theme visibility */
 }
 
 .icon-small.plex-icon {
@@ -207,7 +300,6 @@
     align-items: center;
     z-index: 9999;
 }
-
 .loader {
     border: 4px solid rgba(255, 255, 255, 0.1);
     border-left-color: var(--accent-color);
@@ -233,8 +325,8 @@
         padding: 15px;
     }
     
-    .movie-info {
-        padding: 12px;
+    .movie-card {
+        min-height: 250px;
     }
     
     .movie-info h3 {
