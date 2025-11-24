@@ -451,6 +451,12 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         );
     }
 
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return '';
+        const normalizedPath = imagePath.replace(/\\/g, '/');
+        return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+    }
+
     return (
     <div>    
         <OptionBar
@@ -491,7 +497,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                         {/* 1. 배경: 전체 블러 이미지 */}
                         <div 
                             className={`movie-card-blur-bg ${isNSFWContentBlured ? 'blur-strong' : ''}`}
-                            style={{ backgroundImage: `url(${Config.apiUrl}${movie.image.startsWith('/') ? '' : '/'}${movie.image})` }}
+                            style={{ backgroundImage: `url(${getImageUrl(movie.image)})` }}
                         ></div>
 
                         {/* 2. 컨텐츠 래퍼: 포스터와 정보를 수직으로 배치 */}
@@ -505,7 +511,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                             <Link to={`/movies/${movie._id}`} className="movie-poster-link">
                                 <div 
                                     className="movie-poster-clear"
-                                    style={{ backgroundImage: `url(${Config.apiUrl}${movie.image.startsWith('/') ? '' : '/'}${movie.image})` }}
+                                    style={{ backgroundImage: `url(${getImageUrl(movie.image)})` }}
                                 >
                                     {/* NSFW 필터가 켜져있을 때 포스터 자체도 가려야 한다면 여기에 추가 블러 처리 가능 */}
                                     {isNSFWContentBlured && <div className="nsfw-poster-cover"></div>}
