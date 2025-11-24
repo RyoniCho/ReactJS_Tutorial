@@ -99,7 +99,7 @@
     width: 100%;
     aspect-ratio: 2 / 3; /* Standard movie poster ratio */
     object-fit: cover;
-    object-position: center;
+    object-position: right center;
     transition: filter 0.3s;
 }
 
