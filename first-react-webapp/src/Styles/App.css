@@ -129,6 +129,8 @@ body {
     white-space: nowrap;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+    flex-wrap: nowrap; /* Force single line */
+    align-items: center;
 }
 
 .app-header nav::-webkit-scrollbar {
@@ -234,14 +236,119 @@ input:checked + .slider:before {
 
 /* Responsive */
 @media (max-width: 768px) {
+    .app-header {
+        padding: 0 10px;
+    }
+
+    .header-left h1 {
+        font-size: 1rem; /* Smaller title */
+        white-space: nowrap;
+    }
+
     .app-header nav {
-        display: none; /* Hide nav links on mobile, maybe move to sidebar later */
+        display: flex; /* Show nav on mobile */
+        gap: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 10px;
+        flex-grow: 1; /* Allow it to take available space */
+        mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent); /* Fade effect edges */
+    }
+
+    .app-header nav a, .app-header nav button {
+        font-size: 0.8rem;
+        padding: 5px 8px;
     }
     
     .header-toggles {
         border-left: none;
         padding-left: 0;
+        gap: 8px;
     }
+
+    .toggle-switch {
+        width: 36px;
+        height: 20px;
+        margin-right: 20px;
+    }
+    
+    .slider:before {
+        height: 14px;
+        width: 14px;
+        bottom: 3px;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(16px);
+    }
+
+    .toggle-icon {
+        font-size: 12px;
+        right: -22px;
+    }
+}
+
+/* Login Page */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - var(--header-height) - 40px); /* Adjust for header */
+    padding: 20px;
+}
+
+.login-form {
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid var(--nav-border);
+}
+
+.login-form div {
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.login-form button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-form button:hover {
+    background-color: var(--accent-hover);
 }
 
 
@@ -279,18 +386,8 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.app nav {
-    background-color: var(--nav-bg);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 25px; /* Consistent spacing */
-    box-shadow: 0 2px 10px var(--shadow-color);
-    border-bottom: 1px solid var(--nav-border);
-    transition: background-color 0.3s, border-color 0.3s;
-}
+/* Old nav styles removed to prevent conflicts */
+/* .app nav { ... } */
 
 .app nav a, .app nav button {
     color: var(--nav-text);

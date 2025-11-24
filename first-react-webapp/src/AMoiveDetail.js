@@ -90,6 +90,12 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         return `${date.getFullYear().toString().substr(-2)}년 ${date.getMonth()+1}월`
     }
 
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return '';
+        const normalizedPath = imagePath.replace(/\\/g, '/');
+        return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
+    }
+
     if (!movie) return <div>Loading...</div>;
     
     const availableQualities = movie.mainMovie ? Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]) : [];
@@ -99,9 +105,9 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         <div className="movie-detail">
             <h2>{movie.title}</h2>
             <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
-            <img src={`${Config.apiUrl}/${movie.image}`} alt={movie.title} className="movie-detail-main-image" />
+            <img src={getImageUrl(movie.image)} alt={movie.title} className="movie-detail-main-image" />
             </div>
-            {(movie.extraImage && movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>`${Config.apiUrl}/${img}`)} blur={isNSFWContentBlured}/> : <></>}
+            {(movie.extraImage && movie.extraImage.length>0) ? <ExtraImageSlider images={movie.extraImage.map((img)=>getImageUrl(img))} blur={isNSFWContentBlured}/> : <></>}
             
             <div className="movie-detail-content">
                 <video controls className="movie-detail-trailer">
