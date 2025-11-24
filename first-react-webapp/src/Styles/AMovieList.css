@@ -114,7 +114,8 @@
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: 70% center; /* 가로 이미지일 경우 오른쪽 중심 */
+    background-position: center center; /* 50% (중앙) 정렬 */
+    background-repeat: no-repeat;
     filter: var(--blur-bg-filter); /* 기본적으로 블러 처리된 배경 */
     transform: scale(1.1); /* 블러 가장자리 깨짐 방지 */
     z-index: 0;
@@ -148,7 +149,8 @@
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: 70% center; /* 가로 이미지일 경우 오른쪽 중심 */
+    background-position: center center; /* 50% (중앙) 정렬 */
+    background-repeat: no-repeat;
     transition: transform 0.4s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
