@@ -310,6 +310,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const handleFilterChange = (newFilters) => {
         setMovies([]); // 기존 영화 목록 초기화
         setSearchTerm('');
+        setCurrentPage(1); // 페이지 초기화
         fetchMovies('', newFilters, 1, pageSize); // 첫 페이지부터 다시 로드
     };
 
