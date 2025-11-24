@@ -17,38 +17,63 @@
 }
     */
 
-/* 옵션 바 기본 스타일 */
+/* Modern Theme Option Bar (Variables defined in App.css) */
+
 .option-bar {
     display: flex;
-    flex-wrap: wrap; /* 줄바꿈을 허용 */
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    background-color: #f8f8f8;
-    border-radius: 8px;
-    gap: 10px;
+    padding: 15px 20px;
+    background-color: var(--option-bar-bg);
+    border-radius: 12px;
+    gap: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    border: 1px solid var(--nav-border);
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
-/* 옵션 바 내부 요소 스타일 */
 .option-bar .option-item {
-    flex: 1 1 auto; /* 요소가 필요에 따라 크기를 조절하도록 설정 */
-    min-width: 100px; /* 최소 너비 설정 */
-    max-width: 200px; /* 최대 너비 설정 */
-    padding: 5px 10px;
-    background-color: #e0e0e0;
-    border-radius: 5px;
+    flex: 1 1 auto;
+    min-width: 120px;
+    max-width: 220px;
+    padding: 10px 15px;
+    background-color: var(--option-item-bg);
+    border-radius: 8px;
     text-align: center;
+    color: var(--text-primary);
+    border: 1px solid var(--option-item-border);
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-/* 모바일에서 옵션 바 스타일 조정 */
+.option-bar .option-item:hover {
+    background-color: var(--option-item-hover-bg);
+    border-color: var(--option-item-hover-border);
+}
+
+/* Select/Input styling within option items if any */
+.option-bar select, .option-bar input {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+    width: 100%;
+    outline: none;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/* Mobile adjustments */
 @media (max-width: 768px) {
     .option-bar {
-        flex-direction: column; /* 세로로 정렬 */
-        align-items: stretch; /* 아이템이 전체 너비를 차지하게 설정 */
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
     }
 
     .option-bar .option-item {
-        max-width: none; /* 최대 너비 제한 제거 */
-        min-width: 100%; /* 각 아이템이 전체 너비를 차지하도록 설정 */
+        max-width: none;
+        min-width: 100%;
+        margin-bottom: 5px;
     }
 }

@@ -1,131 +1,160 @@
 
+/* Modern Theme for Movie Detail (Variables defined in App.css) */
+
 .movie-detail {
-    max-width: 1000px;
-    margin: 0 auto;
+    max-width: 1200px;
+    margin: 20px auto;
     padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px var(--shadow-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .movie-detail h2 {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
 .movie-detail-main-image {
     width: 100%;
-    max-height: 500px;
-    object-fit: contain; /* 이미지가 잘리지 않도록 함 */
-    border-radius: 8px;
-    margin-bottom: 20px;
-    background-color: #000; /* 이미지 주위에 여백이 생길 때 배경색이 검정으로 보이도록 함 */
+    max-height: 60vh;
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    background-color: #000;
 }
 
 .movie-detail-content {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 20px;
+    gap: 30px;
 }
 
 .movie-detail-trailer {
     flex: 1;
     width: 100%;
-    max-width: 400px;
-    border-radius: 8px;
+    max-width: 500px;
+    border-radius: 12px;
     outline: none;
+    border: 1px solid var(--nav-border);
 }
 
 .movie-detail-info {
-    flex: 1;
+    flex: 1.5;
+    background: var(--bg-color);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--nav-border);
 }
 
 .movie-detail-info p {
-    margin: 10px 0;
-    font-size: 16px;
-}
-/*
-.delete-button {
-    background-color: #e74c3c;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 20px;
+    margin: 15px 0;
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: var(--text-secondary);
 }
 
-.delete-button:hover {
-    background-color: #c0392b;
+.movie-detail-info p strong {
+    color: var(--text-primary);
+    margin-right: 10px;
+    font-weight: 600;
 }
 
-.edit-button {
-    background-color: #3498db;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
-}
-
-.edit-button:hover {
-    background-color: #2980b9;
-}
-*/
 .button-container {
     display: flex;
-    flex-direction: row;  /* 버튼들을 가로로 배치 */
-    gap: 10px;  /* 버튼들 사이의 간격 */
-    width: 100%;  /* 컨테이너가 전체 너비를 차지하도록 설정 */
-    align-items: center;
-   
-    
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    margin-top: 20px;
 }
 
 .edit-button,
 .delete-button {
-    background-color: #3498db;  /* 기본 버튼 색상 */
     color: white;
-    padding: 10px;
+    padding: 12px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    flex-grow: 1; /* 동일한 너비를 갖도록 설정 */
-    text-align: centers;
-    transition: background-color 0.3s ease;
-    height: 100%;
-    margin-top: 10px;
+    flex-grow: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-size: 1em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.edit-button {
+    background-color: var(--accent-color);
 }
 
 .delete-button {
-    background-color: #e74c3c;  /* 삭제 버튼의 색상 */
+    background-color: var(--danger-color);
 }
 
 .edit-button:hover {
-    background-color: #2980b9;
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .delete-button:hover {
-    background-color: #c0392b;
+    background-color: #e57373; /* Lighter danger color on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
 
 .blur {
-    filter: blur(15px); /* 블러 강도 조절 가능 */
-    transition: filter 0.3s ease; /* 블러 제거/적용 시 애니메이션 */
+    filter: blur(20px);
+    transition: filter 0.3s ease;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
+/* Video Player and Quality Selector */
+.movie-detail h4 {
+    font-size: 1.8em;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.movie-detail select {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 1em;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
     .movie-detail-content {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch; /* Changed from 'center' to 'stretch' */
     }
 
     .movie-detail-trailer {
         max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .movie-detail {
+        padding: 15px;
+    }
+    .movie-detail h2 {
+        font-size: 2em;
+    }
+    .button-container {
+        flex-direction: column;
     }
 }

@@ -91,7 +91,21 @@ function App() {
   const [scrollPositions, setScrollPositions] = useState({});
   const [loginRole, setLoginRole] = useState(null);
   const [logoutTrigger, setLogoutTrigger] = useState(0); // 로그아웃 트리거
+  const [theme, setTheme] = useState('dark'); // Default to dark
   const navigate = useNavigate();
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }, []);
+
+    const handleThemeToggle = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.documentElement.setAttribute('data-theme', newTheme);
+    };
 
     useEffect(() => {
         const accessToken = localStorage.getItem('accessToken');
@@ -173,6 +187,10 @@ function App() {
                 <h1>Control-Room</h1>
                  {/* 토글 버튼 */}
                  <fieldset>
+                    <label>
+                            <input role="switch" type="checkbox" checked={theme === 'dark'} onChange={handleThemeToggle} />
+                            <span>Dark Mode</span>
+                    </label>
                     <label>
                             <input role="switch" type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
                             <span>NSFW SAFE</span>

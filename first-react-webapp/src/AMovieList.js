@@ -435,7 +435,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         const isAllEmpty = !mainMovie || typeof mainMovie !== 'object' || Object.keys(mainMovie).length === 0 || Object.values(mainMovie).every(v => !v);
         if (plexRegistered && isAllEmpty) {
             // plex만 보유, web 없음
-            return <img src={plexIcon} className="icon-small" />;
+            return <img src={plexIcon} className="icon-small plex-icon" />;
         }
         if (isAllEmpty) return null;
         const hasWeb = Object.values(mainMovie).some(v => v);
@@ -443,7 +443,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         const hasFullHD = mainMovie['1080p'];
         return (
             <div>
-                {plexRegistered ? <img src={plexIcon} className="icon-small" /> : null}
+                {plexRegistered ? <img src={plexIcon} className="icon-small plex-icon" /> : null}
                 {hasWeb ? <img src={webIcon} className="icon-small" /> : null}
                 {has4K ? <img src={fourKIcon} className="icon-small" title="4K" /> : null}
                 {hasFullHD ? <img src={fullhdIcon} className="icon-small" title="FullHD" /> : null}

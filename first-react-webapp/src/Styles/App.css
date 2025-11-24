@@ -1,18 +1,101 @@
+:root {
+    /* Light Theme (Default) */
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent-color: #1976d2;
+    --accent-hover: #1565c0;
+    --danger-color: #d32f2f;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --nav-bg: #ffffff;
+    --nav-text: #333333;
+    --nav-border: #e0e0e0;
+    --nav-hover-bg: rgba(0, 0, 0, 0.05);
+    --input-bg: #ffffff;
+    --input-border: #cccccc;
+    --icon-filter: none;
+    --option-bar-bg: #ffffff;
+    --option-item-bg: #f5f5f5;
+    --option-item-border: #e0e0e0;
+    --option-item-hover-bg: #eeeeee;
+    --option-item-hover-border: #bdbdbd;
+    --header-gradient-start: #e3f0ff;
+    --header-gradient-end: #f7f7fa;
+    --total-count-number: #1976d2;
+    --release-date-color: #1976d2;
+}
+
+[data-theme='dark'] {
+    /* Dark Theme */
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --accent-color: #3f51b5;
+    --accent-hover: #536dfe;
+    --danger-color: #cf6679;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --nav-bg: #1f1f1f;
+    --nav-text: #e0e0e0;
+    --nav-border: #333333;
+    --nav-hover-bg: rgba(255, 255, 255, 0.1);
+    --input-bg: #1e1e1e;
+    --input-border: #333333;
+    --icon-filter: brightness(0) invert(1);
+    --option-bar-bg: #1e1e1e;
+    --option-item-bg: #2c2c2c;
+    --option-item-border: #444444;
+    --option-item-hover-bg: #383838;
+    --option-item-hover-border: #555555;
+    --header-gradient-start: #1f1f1f;
+    --header-gradient-end: #2c2c2c;
+    --total-count-number: #64b5f6;
+    --release-date-color: #90caf9;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}
+
 .app nav {
-    background-color: #333;
-    padding: 10px;
-    text-align: center;
+    background-color: var(--nav-bg);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 25px; /* Consistent spacing */
+    box-shadow: 0 2px 10px var(--shadow-color);
+    border-bottom: 1px solid var(--nav-border);
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.app nav a {
-    color: white;
-    margin: 0 15px;
+.app nav a, .app nav button {
+    color: var(--nav-text);
     text-decoration: none;
-    font-size: 18px;
+    font-size: 16px; /* Slightly smaller for better fit */
+    font-weight: 500;
+    transition: color 0.3s, transform 0.2s, background-color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-family: inherit;
 }
 
-.app nav a:hover {
-    text-decoration: underline;
+.app nav a:hover, .app nav button:hover {
+    color: var(--accent-color);
+    background-color: var(--nav-hover-bg);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.app nav a.active {
+    color: var(--accent-color);
 }
 
 .app label {
@@ -20,15 +103,18 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-  }
+    color: var(--text-primary);
+}
 
   [type="checkbox"] {
     appearance: none;
     position: relative;
-    border: max(2px, 0.1em) solid gray;
+    border: max(2px, 0.1em) solid var(--text-secondary);
     border-radius: 1.25em;
     width: 2.25em;
     height: 1.25em;
+    background-color: var(--bg-color);
+    transition: all 0.3s;
   }
 
 
@@ -40,13 +126,13 @@
     height: 1em;
     border-radius: 50%;
     transform: scale(0.8);
-    background-color: gray;
-    transition: left 250ms linear;
+    background-color: var(--text-secondary);
+    transition: left 250ms linear, background-color 0.3s;
   }
   
   [type="checkbox"]:checked {
-    background-color: tomato;
-    border-color: tomato;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
   }
   
   [type="checkbox"]:checked::before {
@@ -55,13 +141,13 @@
   }
   
   [type="checkbox"]:disabled {
-    border-color: lightgray;
+    border-color: var(--text-secondary);
     opacity: 0.7;
     cursor: not-allowed;
   }
   
   [type="checkbox"]:disabled:before {
-    background-color: lightgray;
+    background-color: var(--text-secondary);
   }
   
   [type="checkbox"]:disabled + span {
@@ -71,11 +157,11 @@
   
   [type="checkbox"]:focus-visible {
     outline-offset: max(2px, 0.1em);
-    outline: max(2px, 0.1em) solid tomato;
+    outline: max(2px, 0.1em) solid #3f51b5;
   }
   
   [type="checkbox"]:enabled:hover {
-    box-shadow: 0 0 0 max(4px, 0.2em) lightgray;
+    box-shadow: 0 0 0 max(4px, 0.2em) #444;
   }
 
   *,
