@@ -91,8 +91,9 @@ function App() {
   const [scrollPositions, setScrollPositions] = useState({});
   const [loginRole, setLoginRole] = useState(null);
   const [logoutTrigger, setLogoutTrigger] = useState(0); // 로그아웃 트리거
-  const [theme, setTheme] = useState('dark'); // Default to dark
-  const navigate = useNavigate();
+    const [theme, setTheme] = useState('dark'); // Default to dark
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -184,37 +185,55 @@ function App() {
    
     // <Router>
             <div className="app">
-                <h1>Control-Room</h1>
-                 {/* 토글 버튼 */}
-                 <fieldset>
-                    <label>
-                            <input role="switch" type="checkbox" checked={theme === 'dark'} onChange={handleThemeToggle} />
-                            <span>Dark Mode</span>
-                    </label>
-                    <label>
-                            <input role="switch" type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
-                            <span>NSFW SAFE</span>
-                    </label>
-                </fieldset>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/latest-watched">Continue Watching</Link>
-          {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add Movie</Link> : <></>}
-          {isAuthenticated && loginRole === "admin" ? <Link to="/admin">AdminPage</Link> : <></>}
-          {isAuthenticated ? (<button onClick={handleLogout}>Logout</button>) : 
-          (<Link to="/login">Login</Link>)}
-        </nav>
+                <header className="app-header">
+                    <div className="header-left">
+                        {(location.pathname === '/' || location.pathname === '/latest-watched') && (
+                            <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                                </svg>
+                            </button>
+                        )}
+                        <h1>Control-Room</h1>
+                    </div>
+                    
+                    <div className="header-right">
+                        <nav>
+                            <Link to="/">Home</Link>
+                            <Link to="/latest-watched">Recent</Link>
+                            {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add</Link> : <></>}
+                            {isAuthenticated && loginRole === "admin" ? <Link to="/admin">Admin</Link> : <></>}
+                            {isAuthenticated ? (<button className="nav-btn" onClick={handleLogout}>Logout</button>) : 
+                            (<Link to="/login">Login</Link>)}
+                        </nav>
+                        <div className="header-toggles">
+                            <label className="toggle-switch" title="Dark Mode">
+                                <input type="checkbox" checked={theme === 'dark'} onChange={handleThemeToggle} />
+                                <span className="slider round"></span>
+                                <span className="toggle-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+                            </label>
+                            <label className="toggle-switch" title="NSFW Safe">
+                                <input type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
+                                <span className="slider round"></span>
+                                <span className="toggle-icon">{isNSFWContentBlured ? '🔒' : '🔓'}</span>
+                            </label>
+                        </div>
+                    </div>
+                </header>
                 
-                
-        <Routes>
-          <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger}/>} />
-                    <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} />} />
-          <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
-          <Route path="/add" element={<RegistInfo/>} />
-          <Route path="edit/:id" element={<EditMovie/>}/>
-          <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
-          <Route path="/admin" element={<AdminPage/>}/>
-        </Routes>
+                <div className="main-content">
+                    <Routes>
+                        <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}/>} />
+                        <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
+                        <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
+                        <Route path="/add" element={<RegistInfo/>} />
+                        <Route path="edit/:id" element={<EditMovie/>}/>
+                        <Route path="/login" element={<Login onLogin={handleLogin}/>}/>
+                        <Route path="/admin" element={<AdminPage/>}/>
+                    </Routes>
+                </div>
             </div>
         // </Router>
   )

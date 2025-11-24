@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Config from './Config'
 import axios from 'axios';
-import OptionBar from './OptionBar';
+import Sidebar from './Sidebar';
 import plexIcon  from './Icons/plex.svg'
 import webIcon from './Icons/web.svg'
 import fourKIcon from './Icons/4k.svg'
 import fullhdIcon from './Icons/fullhd.svg'
 
-const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,logoutTrigger}) => {
+const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,logoutTrigger, isSidebarOpen, setIsSidebarOpen}) => {
 
     const [isLoading,setIsLoading] = useState(false);
     const [movies, setMovies] = useState([]);
@@ -459,7 +459,9 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
     return (
     <div>    
-        <OptionBar
+        <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
             isAuthenticated={isAuthenticated}
             actors={actors}
             selectedActor={selectedActor}
@@ -472,25 +474,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             setSelectedCategory={HandleSetSelectedCategory}
             subscriptExist = {subscriptExist}
             setSubscriptExist={HandleSetSubscriptExist}
-
+            searchTerm={searchTerm}
+            onSearchChange={handleSearch}
+            totalCount={totalCount}
          />
         <div className="movie-list">
-            <div className="movie-list-header">
-                <span className="total-count-label">
-                    <svg className="total-count-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="10" cy="10" r="10" fill="#1976d2"/>
-                        <text x="10" y="15" textAnchor="middle" fontSize="12" fill="#fff" fontWeight="bold">#</text>
-                    </svg>
-                    <b>Totals</b> <span className="total-count-number">{totalCount}</span> Results
-                </span>
-            </div>
-            <input
-                type="text"
-                value={searchTerm}
-                placeholder="Search by serial number..."
-                onChange={handleSearch}
-                className="search-input"
-            />
             <div className="movies">
                 {movies.map((movie) => (
                     <div key={movie._id} className="movie-card">
