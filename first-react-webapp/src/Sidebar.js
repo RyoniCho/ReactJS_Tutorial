@@ -19,7 +19,8 @@ const Sidebar = ({
     setSubscriptExist,
     searchTerm,
     onSearchChange,
-    totalCount
+    totalCount,
+    sortOptions
 }) => {
     const filteredCategories = Config.categories.filter(cate =>
         (!isAuthenticated && cate === "AdultVideo") ? false : true
@@ -77,10 +78,18 @@ const Sidebar = ({
                     <div className="filter-group">
                         <label>Sort By</label>
                         <select value={sortOrder} onChange={e => setSortOrder(e.target.value)}>
-                            <option value="asc">Release Date: Ascending</option>
-                            <option value="desc">Release Date: Descending</option>
-                            <option value="createdAsc">Created Date: Ascending</option>
-                            <option value="createdDesc">Created Date: Descending</option>
+                            {sortOptions ? (
+                                sortOptions.map(opt => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                ))
+                            ) : (
+                                <>
+                                    <option value="asc">Release Date: Ascending</option>
+                                    <option value="desc">Release Date: Descending</option>
+                                    <option value="createdAsc">Created Date: Ascending</option>
+                                    <option value="createdDesc">Created Date: Descending</option>
+                                </>
+                            )}
                         </select>
                     </div>
 

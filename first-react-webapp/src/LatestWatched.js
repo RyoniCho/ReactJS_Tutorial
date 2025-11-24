@@ -25,7 +25,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   // Filter States
   const [actors, setActors] = useState([]);
   const [selectedActor, setSelectedActor] = useState(localStorage.getItem("selectedActor") || '');
-  const [sortOrder, setSortOrder] = useState(localStorage.getItem("sortorder") || 'desc');
+  const [sortOrder, setSortOrder] = useState(localStorage.getItem("historySortOrder") || 'watchedDesc');
   const [owned, setOwned] = useState(localStorage.getItem("owned") || 'all');
   const [selectedCategory, setSelectedCategory]= useState(localStorage.getItem("selectedCategory") || '');
   const [subscriptExist, setSubscriptExist] = useState(localStorage.getItem("subscriptExist") || 'all');
@@ -58,7 +58,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
 
   // Handlers to update state and localStorage
   const handleSetSortOrder = (value) => {
-      localStorage.setItem("sortorder", value);
+      localStorage.setItem("historySortOrder", value);
       setSortOrder(value);
   };
 
@@ -168,27 +168,11 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
         if (sortOrder === 'asc') return dateA - dateB;
         if (sortOrder === 'desc') return dateB - dateA;
         
-        // For createdAsc/Desc, we could use history updatedAt or movie createdAt.
-        // Let's use history updatedAt (Last Watched) as it makes more sense here?
-        // Or stick to movie created date to be consistent with the filter name?
-        // The Sidebar says "Created Date". Let's use movie created date for consistency,
-        // OR we can interpret it as "Watched Date" for this page.
-        // Given the context "Latest Watched", default sort is usually by watched time.
-        // But the Sidebar options are fixed.
-        // Let's use movie creation date for now to match the label.
-        
-        // Use _id for creation sort if createdAt is missing (as _id contains timestamp)
-        const getCreationTime = (item) => {
-            if (item.movieId?.createdAt) return new Date(item.movieId.createdAt).getTime();
-            if (item.movieId?._id) return parseInt(item.movieId._id.substring(0, 8), 16) * 1000;
-            return 0;
-        };
+        const watchedA = new Date(a.updatedAt || 0);
+        const watchedB = new Date(b.updatedAt || 0);
 
-        const createdA = getCreationTime(a);
-        const createdB = getCreationTime(b);
-
-        if (sortOrder === 'createdAsc') return createdA - createdB;
-        if (sortOrder === 'createdDesc') return createdB - createdA;
+        if (sortOrder === 'watchedAsc') return watchedA - watchedB;
+        if (sortOrder === 'watchedDesc') return watchedB - watchedA;
 
         return 0;
     });
@@ -196,6 +180,13 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
 
   if (loading) return <div>Loading...</div>;
   // if (!histories.length) return <div>최근 시청 기록이 없습니다.</div>; // Don't return early, show empty list with sidebar
+
+  const historySortOptions = [
+      { value: "watchedDesc", label: "최근 시청 순" },
+      { value: "watchedAsc", label: "오래된 시청 순" },
+      { value: "desc", label: "최신 개봉일 순" },
+      { value: "asc", label: "오래된 개봉일 순" },
+  ];
 
   return (
     <div>
@@ -208,6 +199,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
             setSelectedActor={handleSetSelectedActor}
             sortOrder={sortOrder}
             setSortOrder={handleSetSortOrder}
+            sortOptions={historySortOptions}
             owned={owned}
             setOwned={handleSetOwned}
             selectedCategory={selectedCategory}
