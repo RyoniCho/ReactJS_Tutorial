@@ -3,6 +3,34 @@ import "./Styles/ExtraImageSlider.css"
 
 const ExtraImageSlider = ({ images, blur }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+
+    // Minimum swipe distance (in px)
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null); // Reset touch end
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) {
+            nextImage();
+        } else if (isRightSwipe) {
+            prevImage();
+        }
+    };
 
     const nextImage = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -17,7 +45,12 @@ const ExtraImageSlider = ({ images, blur }) => {
     if (!images || images.length === 0) return null;
 
     return (
-        <div className="slider-container">
+        <div 
+            className="slider-container"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+        >
             <div className={`slider-wrapper ${blur ? 'blur' : ''}`}>
                 <img
                     src={images[currentImageIndex]}

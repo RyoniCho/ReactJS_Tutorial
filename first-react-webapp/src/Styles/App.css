@@ -116,28 +116,24 @@ body {
     background-color: var(--nav-hover-bg);
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
+/* Removed .header-right as it's no longer used */
 
-.app-header nav {
+.header-nav {
     display: flex;
     gap: 15px;
     overflow-x: auto;
     white-space: nowrap;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
-    flex-wrap: nowrap; /* Force single line */
+    flex-wrap: nowrap;
     align-items: center;
 }
 
-.app-header nav::-webkit-scrollbar {
+.header-nav::-webkit-scrollbar {
     display: none;
 }
 
-.app-header nav a, .app-header nav button {
+.header-nav a, .header-nav button {
     color: var(--nav-text);
     text-decoration: none;
     font-size: 0.9rem;
@@ -151,7 +147,7 @@ body {
     flex-shrink: 0;
 }
 
-.app-header nav a:hover, .app-header nav button:hover {
+.header-nav a:hover, .header-nav button:hover {
     background-color: var(--nav-hover-bg);
     color: var(--accent-color);
 }
@@ -160,9 +156,9 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    border-left: 1px solid var(--nav-border);
     padding-left: 20px;
     flex-shrink: 0;
+    /* Removed border-left as it might look weird in new layout */
 }
 
 /* Toggle Switch */
@@ -236,36 +232,55 @@ input:checked + .slider:before {
 
 /* Responsive */
 @media (max-width: 768px) {
+    :root {
+        --header-height: 100px; /* Increased height for 2 rows */
+    }
+
     .app-header {
-        padding: 0 10px;
+        padding: 10px 15px;
+        flex-wrap: wrap; /* Allow wrapping */
+        align-content: center;
+        height: auto; /* Auto height to fit content */
+        min-height: var(--header-height);
+    }
+
+    .header-left {
+        order: 1;
+        flex: 1; /* Take available space */
     }
 
     .header-left h1 {
-        font-size: 1rem; /* Smaller title */
+        font-size: 1.1rem;
         white-space: nowrap;
     }
 
-    .app-header nav {
-        display: flex; /* Show nav on mobile */
+    .header-toggles {
+        order: 2;
+        padding-left: 0;
+        gap: 10px;
+        margin-left: auto; /* Push to right */
+    }
+
+    .header-nav {
+        order: 3;
+        width: 100%; /* Full width for second row */
+        margin-top: 10px;
+        padding-top: 5px;
+        border-top: 1px solid var(--nav-border);
+        display: flex;
         gap: 10px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        margin: 0 10px;
-        flex-grow: 1; /* Allow it to take available space */
-        mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent); /* Fade effect edges */
+        mask-image: linear-gradient(to right, transparent, black 5px, black 95%, transparent);
     }
 
-    .app-header nav a, .app-header nav button {
-        font-size: 0.8rem;
-        padding: 5px 8px;
+    .header-nav a, .header-nav button {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        background-color: var(--nav-hover-bg); /* Slight bg to make them look like buttons */
+        border-radius: 20px; /* Pill shape */
     }
     
-    .header-toggles {
-        border-left: none;
-        padding-left: 0;
-        gap: 8px;
-    }
-
     .toggle-switch {
         width: 36px;
         height: 20px;
@@ -285,6 +300,10 @@ input:checked + .slider:before {
     .toggle-icon {
         font-size: 12px;
         right: -22px;
+    }
+    
+    .main-content {
+        padding-top: 120px; /* Adjust for taller header */
     }
 }
 

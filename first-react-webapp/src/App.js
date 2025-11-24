@@ -199,27 +199,26 @@ function App() {
                         <h1>Control-Room</h1>
                     </div>
                     
-                    <div className="header-right">
-                        <nav>
-                            <Link to="/">Home</Link>
-                            <Link to="/latest-watched">Recent</Link>
-                            {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add</Link> : <></>}
-                            {isAuthenticated && loginRole === "admin" ? <Link to="/admin">Admin</Link> : <></>}
-                            {isAuthenticated ? (<button className="nav-btn" onClick={handleLogout}>Logout</button>) : 
-                            (<Link to="/login">Login</Link>)}
-                        </nav>
-                        <div className="header-toggles">
-                            <label className="toggle-switch" title="Dark Mode">
-                                <input type="checkbox" checked={theme === 'dark'} onChange={handleThemeToggle} />
-                                <span className="slider round"></span>
-                                <span className="toggle-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
-                            </label>
-                            <label className="toggle-switch" title="NSFW Safe">
-                                <input type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
-                                <span className="slider round"></span>
-                                <span className="toggle-icon">{isNSFWContentBlured ? '🔒' : '🔓'}</span>
-                            </label>
-                        </div>
+                    <nav className="header-nav">
+                        <Link to="/">Home</Link>
+                        <Link to="/latest-watched">Recent</Link>
+                        {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add</Link> : <></>}
+                        {isAuthenticated && loginRole === "admin" ? <Link to="/admin">Admin</Link> : <></>}
+                        {isAuthenticated ? (<button className="nav-btn" onClick={handleLogout}>Logout</button>) : 
+                        (<Link to="/login">Login</Link>)}
+                    </nav>
+
+                    <div className="header-toggles">
+                        <label className="toggle-switch" title="Dark Mode">
+                            <input type="checkbox" checked={theme === 'dark'} onChange={handleThemeToggle} />
+                            <span className="slider round"></span>
+                            <span className="toggle-icon">{theme === 'dark' ? '🌙' : '☀️'}</span>
+                        </label>
+                        <label className="toggle-switch" title="NSFW Safe">
+                            <input type="checkbox" checked={isNSFWContentBlured} onChange={handleToggle} />
+                            <span className="slider round"></span>
+                            <span className="toggle-icon">{isNSFWContentBlured ? '🔒' : '🔓'}</span>
+                        </label>
                     </div>
                 </header>
                 
