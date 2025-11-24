@@ -24,11 +24,11 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   
   // Filter States
   const [actors, setActors] = useState([]);
-  const [selectedActor, setSelectedActor] = useState('');
-  const [sortOrder, setSortOrder] = useState('desc'); // Default to desc for history
-  const [owned, setOwned] = useState('all');
-  const [selectedCategory, setSelectedCategory]= useState('');
-  const [subscriptExist, setSubscriptExist] = useState('all');
+  const [selectedActor, setSelectedActor] = useState(localStorage.getItem("selectedActor") || '');
+  const [sortOrder, setSortOrder] = useState(localStorage.getItem("sortorder") || 'desc');
+  const [owned, setOwned] = useState(localStorage.getItem("owned") || 'all');
+  const [selectedCategory, setSelectedCategory]= useState(localStorage.getItem("selectedCategory") || '');
+  const [subscriptExist, setSubscriptExist] = useState(localStorage.getItem("subscriptExist") || 'all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchHistories = () => {
@@ -55,6 +55,32 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
     fetchHistories();
     fetchActors();
   }, []);
+
+  // Handlers to update state and localStorage
+  const handleSetSortOrder = (value) => {
+      localStorage.setItem("sortorder", value);
+      setSortOrder(value);
+  };
+
+  const handleSetSelectedActor = (value) => {
+      localStorage.setItem("selectedActor", value);
+      setSelectedActor(value);
+  };
+
+  const handleSetOwned = (value) => {
+      localStorage.setItem("owned", value);
+      setOwned(value);
+  };
+
+  const handleSetSelectedCategory = (value) => {
+      localStorage.setItem("selectedCategory", value);
+      setSelectedCategory(value);
+  };
+
+  const handleSetSubscriptExist = (value) => {
+      localStorage.setItem("subscriptExist", value);
+      setSubscriptExist(value);
+  };
 
   const handleDelete = async (historyId) => {
     if (!window.confirm('정말 이 시청 기록을 삭제하시겠습니까?')) return;
@@ -113,6 +139,14 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
                 const hasWeb = movie.mainMovie && typeof movie.mainMovie === 'object' && Object.values(movie.mainMovie).some(v => v);
                 if (!hasWeb) return false;
             }
+            if (owned === 'web4k') {
+                const has4K = movie.mainMovie && typeof movie.mainMovie === 'object' && (movie.mainMovie['4k'] || movie.mainMovie['2160p']);
+                if (!has4K) return false;
+            }
+            if (owned === 'web1080p') {
+                const hasFullHD = movie.mainMovie && typeof movie.mainMovie === 'object' && movie.mainMovie['1080p'];
+                if (!hasFullHD) return false;
+            }
             if (owned === 'false') {
                 const isMainMovieEmpty = !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v);
                 if (movie.plexRegistered || !isMainMovieEmpty) return false;
@@ -143,8 +177,15 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
         // But the Sidebar options are fixed.
         // Let's use movie creation date for now to match the label.
         
-        const createdA = new Date(a.movieId?.createdAt || 0);
-        const createdB = new Date(b.movieId?.createdAt || 0);
+        // Use _id for creation sort if createdAt is missing (as _id contains timestamp)
+        const getCreationTime = (item) => {
+            if (item.movieId?.createdAt) return new Date(item.movieId.createdAt).getTime();
+            if (item.movieId?._id) return parseInt(item.movieId._id.substring(0, 8), 16) * 1000;
+            return 0;
+        };
+
+        const createdA = getCreationTime(a);
+        const createdB = getCreationTime(b);
 
         if (sortOrder === 'createdAsc') return createdA - createdB;
         if (sortOrder === 'createdDesc') return createdB - createdA;
@@ -164,15 +205,15 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
             isAuthenticated={isAuthenticated}
             actors={actors}
             selectedActor={selectedActor}
-            setSelectedActor={setSelectedActor}
+            setSelectedActor={handleSetSelectedActor}
             sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
+            setSortOrder={handleSetSortOrder}
             owned={owned}
-            setOwned={setOwned}
+            setOwned={handleSetOwned}
             selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+            setSelectedCategory={handleSetSelectedCategory}
             subscriptExist = {subscriptExist}
-            setSubscriptExist={setSubscriptExist}
+            setSubscriptExist={handleSetSubscriptExist}
             searchTerm={searchTerm}
             onSearchChange={(e) => setSearchTerm(e.target.value)}
             totalCount={filteredHistories.length}
