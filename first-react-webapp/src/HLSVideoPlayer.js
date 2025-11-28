@@ -11,6 +11,8 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const navigate = useNavigate();
+  const prevMovieIdRef = useRef(movieId);
+
   // 토큰 만료 체크 함수
   const isTokenExpired = (token) => {
     if (!token) return true;
@@ -27,22 +29,56 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     const video = videoRef.current;
     if (!video) return;
 
+    let hls;
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // 화질 변경 시 재생 위치 유지를 위한 로직
+    let startTime = 0;
+    if (prevMovieIdRef.current === movieId) {
+        // 같은 영화인데 소스가 변경된 경우 (화질 변경)
+        startTime = video.currentTime;
+    } else {
+        // 다른 영화로 변경된 경우
+        prevMovieIdRef.current = movieId;
+    }
+
+    const onLoadedMetadata = () => {
+        console.log("Video ready to play (Safari native HLS).");
+        if (startTime > 0) {
+            video.currentTime = startTime;
+            // 자동 재생 시도 (브라우저 정책에 따라 실패할 수 있음)
+            video.play().catch(e => console.log("Auto-play failed", e));
+        }
+    };
 
     if (isSafari && video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = videoSrc;
-      video.addEventListener('loadedmetadata', () => {
-        console.log("Video ready to play (Safari native HLS).");
-      });
+      video.addEventListener('loadedmetadata', onLoadedMetadata, { once: true });
     } else if (Hls.isSupported()) {
-      const hls = new Hls();
+      // startPosition을 명시적으로 설정하여 EVENT 타입 플레이리스트에서도 처음부터 재생되도록 강제
+      hls = new Hls({
+        startPosition: startTime
+      });
       hls.loadSource(videoSrc);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log("Video ready to play (HLS.js).");
+        video.play().catch(e => console.log("Auto-play failed", e));
       });
     }
-  }, [videoSrc]);
+
+    return () => {
+        if (hls) {
+            hls.destroy();
+        }
+        if (isSafari) {
+             video.removeEventListener('loadedmetadata', onLoadedMetadata);
+        }
+        // 소스 변경 시 비디오 태그 초기화 (잔여 버퍼 제거)
+        video.removeAttribute('src');
+        video.load();
+    };
+  }, [videoSrc, movieId]);
 
   // 시청 기록 조회
   useEffect(() => {
