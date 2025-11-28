@@ -108,16 +108,15 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         // 브라우저 직접 다운로드 방식으로 변경 (메모리 부족 방지)
         const downloadUrl = `${Config.apiUrl}/api/download?file=${encodeURIComponent(moviePath)}&resolution=${selectedQuality}&token=${accessToken}`;
         
-        // 숨겨진 iframe을 사용하여 다운로드 트리거 (현재 페이지 유지)
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = downloadUrl;
-        document.body.appendChild(iframe);
-
-        // iframe은 다운로드 시작 후 제거 (약간의 지연 필요)
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 60000); // 1분 뒤 제거 (충분한 시간)
+        // a 태그를 사용하여 다운로드 트리거 (가장 안정적인 방법)
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', `${movie.serialNumber}_${selectedQuality}.mp4`); // 파일명 힌트
+        document.body.appendChild(link);
+        link.click();
+        
+        // 클릭 후 바로 제거해도 다운로드 매니저로 이관되었으므로 안전함
+        document.body.removeChild(link);
     };
 
     if (!movie) return <div>Loading...</div>;
