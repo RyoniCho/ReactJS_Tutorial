@@ -105,31 +105,19 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         
         if(!window.confirm(`${selectedQuality} 화질로 다운로드를 시작하시겠습니까? (파일 크기에 따라 시간이 소요될 수 있습니다)`)) return;
 
-        try {
-            const response = await fetch(`${Config.apiUrl}/api/download?file=${encodeURIComponent(moviePath)}&resolution=${selectedQuality}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${accessToken}`
-                }
-            });
+        // 브라우저 직접 다운로드 방식으로 변경 (메모리 부족 방지)
+        const downloadUrl = `${Config.apiUrl}/api/download?file=${encodeURIComponent(moviePath)}&resolution=${selectedQuality}&token=${accessToken}`;
+        
+        // 숨겨진 iframe을 사용하여 다운로드 트리거 (현재 페이지 유지)
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = downloadUrl;
+        document.body.appendChild(iframe);
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${movie.serialNumber}_${selectedQuality}.mp4`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Download failed:', error);
-            alert('다운로드에 실패했습니다.');
-        }
+        // iframe은 다운로드 시작 후 제거 (약간의 지연 필요)
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 60000); // 1분 뒤 제거 (충분한 시간)
     };
 
     if (!movie) return <div>Loading...</div>;
