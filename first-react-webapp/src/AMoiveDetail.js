@@ -96,6 +96,42 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
     }
 
+    const handleDownload = async () => {
+        if (!selectedQuality) return;
+        const moviePath = movie.mainMovie[selectedQuality];
+        if (!moviePath) return;
+
+        const accessToken = localStorage.getItem('accessToken');
+        
+        if(!window.confirm(`${selectedQuality} 화질로 다운로드를 시작하시겠습니까? (파일 크기에 따라 시간이 소요될 수 있습니다)`)) return;
+
+        try {
+            const response = await fetch(`${Config.apiUrl}/api/download?file=${encodeURIComponent(moviePath)}&resolution=${selectedQuality}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${movie.serialNumber}_${selectedQuality}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('다운로드에 실패했습니다.');
+        }
+    };
+
     if (!movie) return <div>Loading...</div>;
     
     const availableQualities = movie.mainMovie ? Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]) : [];
@@ -146,13 +182,16 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             {availableQualities.length > 0 && (
                 <>
                     <h4>Main Movie</h4>
-                    <div style={{ marginBottom: 8 }}>
-                        <label>화질 선택: </label>
-                        <select value={selectedQuality} onChange={e => setSelectedQuality(e.target.value)}>
+                    <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
+                        <label style={{marginRight: '5px'}}>화질 선택: </label>
+                        <select value={selectedQuality} onChange={e => setSelectedQuality(e.target.value)} style={{marginRight: '10px'}}>
                             {availableQualities.map(q => (
                                 <option key={q} value={q}>{q}</option>
                             ))}
                         </select>
+                        <button onClick={handleDownload} style={{padding: '4px 10px', cursor: 'pointer', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px'}}>
+                            Download
+                        </button>
                     </div>
                     <HLSVideoPlayer
                         videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie[selectedQuality]}&resolution=${selectedQuality}`}
