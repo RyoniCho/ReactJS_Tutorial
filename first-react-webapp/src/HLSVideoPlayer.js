@@ -11,7 +11,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const navigate = useNavigate();
-  const prevMovieIdRef = useRef(movieId);
+  const playbackStateRef = useRef({ movieId: null, src: null, time: 0 });
 
   // 토큰 만료 체크 함수
   const isTokenExpired = (token) => {
@@ -34,20 +34,16 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
 
     // 화질 변경 시 재생 위치 유지를 위한 로직
     let startTime = 0;
-    if (prevMovieIdRef.current === movieId) {
-        // 같은 영화인데 소스가 변경된 경우 (화질 변경)
-        startTime = video.currentTime;
-    } else {
-        // 다른 영화로 변경된 경우
-        prevMovieIdRef.current = movieId;
+
+    // 같은 영화이면서 소스(화질)만 변경된 경우에만 재생 위치 복원
+    if (playbackStateRef.current.movieId === movieId && playbackStateRef.current.src !== videoSrc) {
+        startTime = playbackStateRef.current.time;
     }
 
     const onLoadedMetadata = () => {
         console.log("Video ready to play (Safari native HLS).");
         if (startTime > 0) {
             video.currentTime = startTime;
-            // 자동 재생 시도 (브라우저 정책에 따라 실패할 수 있음)
-            video.play().catch(e => console.log("Auto-play failed", e));
         }
     };
 
@@ -63,11 +59,17 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log("Video ready to play (HLS.js).");
-        video.play().catch(e => console.log("Auto-play failed", e));
       });
     }
 
     return () => {
+        // 현재 상태 저장 (다음 렌더링 시 비교용)
+        playbackStateRef.current = {
+            movieId: movieId,
+            src: videoSrc,
+            time: video.currentTime
+        };
+
         if (hls) {
             hls.destroy();
         }

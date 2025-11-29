@@ -12,6 +12,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const [movie, setMovie] = useState(null);
     const [loginRole, setLoginRole] = useState(null);
     const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const [selectedQuality, setSelectedQuality] = useState('');
     // availableQualities의 첫 번째 값으로 selectedQuality 자동 설정
@@ -56,8 +57,42 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             }
         };
 
+        const checkFavorite = async () => {
+            if (!accessToken) return;
+            try {
+                const res = await axios.get(`${Config.apiUrl}/api/favorites/ids`, {
+                    headers: { Authorization: `Bearer ${accessToken}` }
+                });
+                if (res.data.includes(id)) {
+                    setIsFavorite(true);
+                } else {
+                    setIsFavorite(false);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
         fetchMovie();
+        checkFavorite();
     }, [id]);
+
+    const toggleFavorite = async () => {
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+        try {
+            const res = await axios.post(`${Config.apiUrl}/api/favorites`, { movieId: id }, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            setIsFavorite(res.data.favorited);
+        } catch (err) {
+            console.error(err);
+            alert('즐겨찾기 변경 실패');
+        }
+    };
 
     const deleteMovie = async () => {
         try {
@@ -126,7 +161,25 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
     return (
         <div className="movie-detail">
-            <h2>{movie.title}</h2>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                <h2>{movie.title}</h2>
+                {isAuthenticated && (
+                    <button 
+                        onClick={toggleFavorite}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '2rem',
+                            cursor: 'pointer',
+                            color: isFavorite ? '#ff4081' : '#ccc',
+                            padding: '0 10px'
+                        }}
+                        title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    >
+                        {isFavorite ? '♥' : '♡'}
+                    </button>
+                )}
+            </div>
             <div className={`${isNSFWContentBlured ? 'blur' : ''}`}>
             <img src={getImageUrl(movie.image)} alt={movie.title} className="movie-detail-main-image" />
             </div>
@@ -188,7 +241,11 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                 </>
             )}
             </div>
-           
+            <div className="favorite-container">
+                <button onClick={toggleFavorite} className={`favorite-button ${isFavorite ? 'favorited' : ''}`}>
+                    {isFavorite ? '★' : '☆'} 즐겨찾기
+                </button>
+            </div>
         </div>
     );
 };

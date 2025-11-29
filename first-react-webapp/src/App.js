@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
 import './Styles/App.css';
 import EditMovie from "./EditMovie";
 import LatestWatched from "./LatestWatched";
+import Favorites from "./Favorites";
 import { useState,useEffect } from "react";
 import Login from "./Login";
 import { useLocation } from 'react-router-dom';
@@ -187,7 +188,7 @@ function App() {
             <div className="app">
                 <header className="app-header">
                     <div className="header-left">
-                        {(location.pathname === '/' || location.pathname === '/latest-watched') && (
+                        {(location.pathname === '/' || location.pathname === '/latest-watched' || location.pathname === '/favorites') && (
                             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -202,6 +203,7 @@ function App() {
                     <nav className="header-nav">
                         <Link to="/">Home</Link>
                         <Link to="/latest-watched">Recent</Link>
+                        <Link to="/favorites">Favorite</Link>
                         {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add</Link> : <></>}
                         {isAuthenticated && loginRole === "admin" ? <Link to="/admin">Admin</Link> : <></>}
                         {isAuthenticated ? (<button className="nav-btn" onClick={handleLogout}>Logout</button>) : 
@@ -226,6 +228,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}/>} />
                         <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
+                        <Route path="/favorites" element={<Favorites isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
                         <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
                         <Route path="/add" element={<RegistInfo/>} />
                         <Route path="edit/:id" element={<EditMovie/>}/>

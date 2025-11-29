@@ -29,15 +29,18 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const [hasMore,setHasMore] = useState(true);
     const [initialFetch,setInitialFetch] = useState(false);
     const navigate = useNavigate(); 
-
+    const [favoriteIds, setFavoriteIds] = useState([]);
 
 
     useEffect(() => {
         const initialFilter = getInitialFilterCachedValue();
         fetchActors();
         fetchMovies('', initialFilter, 1, pageSize);
+        if (isAuthenticated) {
+            fetchFavorites();
+        }
         setInitialFetch(true);
-    }, []);
+    }, [isAuthenticated]);
 
     // 로그아웃 트리거가 바뀌면 목록 초기화 및 재조회
     useEffect(() => {
@@ -223,9 +226,22 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             const data = await response.json();
             // 서버에서 { movies, totalCount } 형태로 반환됨
             if (data.movies && data.movies.length > 0) {
-                setMovies(prev => [...prev, ...data.movies]); // 새 데이터 추가
+                if (page === 1) {
+                    setMovies(data.movies);
+                } else {
+                    setMovies(prev => {
+                        // 중복 제거 로직 추가 (기존에 있는 ID는 제외하고 추가)
+                        const newMovies = data.movies.filter(newMovie => 
+                            !prev.some(prevMovie => prevMovie._id === newMovie._id)
+                        );
+                        return [...prev, ...newMovies];
+                    });
+                }
                 setHasMore(true);
             } else {
+                if (page === 1) {
+                    setMovies([]);
+                }
                 setHasMore(false);
                 console.log("fetch Movie -> data is null");
             }
@@ -310,86 +326,18 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const handleFilterChange = (newFilters) => {
         setMovies([]); // 기존 영화 목록 초기화
         setSearchTerm('');
-        setCurrentPage(1); // 페이지 초기화
-        fetchMovies('', newFilters, 1, pageSize); // 첫 페이지부터 다시 로드
+        
+        // currentPage가 1이면 useEffect가 트리거되지 않으므로 직접 호출
+        // currentPage가 1이 아니면 1로 설정하여 useEffect가 트리거되도록 함
+        if (currentPage === 1) {
+            fetchMovies('', newFilters, 1, pageSize);
+        } else {
+            setCurrentPage(1);
+        }
     };
 
-    const filteredMovies = movies
-        .filter(movie => selectedActor ? movie.actor === selectedActor : true)
-        .filter(movie => {
-            if (owned === 'plex') return movie.plexRegistered === true;
-            if (owned === 'web') {
-                // mainMovie의 값이 하나라도 있으면 true
-                return movie.mainMovie && typeof movie.mainMovie === 'object' && Object.values(movie.mainMovie).some(v => v);
-            }
-            if (owned === 'false') {
-                // plexRegistered가 false이고 mainMovie의 모든 값이 비어있으면 미보유
-                const isMainMovieEmpty = !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v);
-                return movie.plexRegistered === false && isMainMovieEmpty;
-            }
-            return true;
-        })
-        .filter(movie => {
-            if(subscriptExist==='all')
-                return true;
-            else
-            {
-                if(subscriptExist === 'true') 
-                    return  movie.subscriptExist === true;
-                else
-                    return movie.subscriptExist === false;
-            }
-
-        })
-        .filter(movie=> {
-            if(selectedCategory)
-            {
-                if(selectedCategory === "all")
-                {
-                    if(movie.category === "AdultVideo")
-                    {
-                        if(isAuthenticated)
-                            return true;
-                        else
-                        {
-                            return false;
-                        }
-                        
-                    }
-                    return true;
-                }
-                    
-                else if(selectedCategory === movie.category)
-                {
-                    if(movie.category ==="AdultVideo")
-                    {
-                        if(isAuthenticated)
-                            return true;
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-
-            }
-            else{
-                if(movie.category==="AdultVideo" && !isAuthenticated )
-                    return false;
-
-                return true;
-            }
-
-        })
-            
-        .sort((a, b) => {
-            if (sortOrder === 'asc') {
-                return new Date(a.releaseDate) - new Date(b.releaseDate);
-            } else {
-                return new Date(b.releaseDate) - new Date(a.releaseDate);
-            }
-        });
+    // 클라이언트 사이드 필터링 제거 (서버 사이드 필터링 사용)
+    const filteredMovies = movies;
 
     const HandleSetSortOrder=(value)=>{
 
@@ -458,6 +406,43 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
     }
 
+    const fetchFavorites = async () => {
+        try {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) return;
+            const res = await axios.get(`${Config.apiUrl}/api/favorites/ids`, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            setFavoriteIds(res.data);
+        } catch (err) {
+            console.error('Error fetching favorites:', err);
+        }
+    };
+
+    const toggleFavorite = async (e, movieId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+            alert('로그인이 필요합니다.');
+            return;
+        }
+
+        try {
+            const res = await axios.post(`${Config.apiUrl}/api/favorites`, { movieId }, {
+                headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            if (res.data.favorited) {
+                setFavoriteIds(prev => [...prev, movieId]);
+            } else {
+                setFavoriteIds(prev => prev.filter(id => id !== movieId));
+            }
+        } catch (err) {
+            console.error('Error toggling favorite:', err);
+        }
+    };
+
     return (
     <div>    
         <Sidebar
@@ -492,8 +477,17 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                         {/* 2. 컨텐츠 래퍼: 포스터와 정보를 수직으로 배치 */}
                         <div className="movie-card-inner">
                             {/* 시리얼 넘버: 카드 맨 위로 이동 */}
-                            <div className="movie-info-top">
+                            <div className="movie-info-top" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <p>{movie.serialNumber}</p>
+                                {isAuthenticated && (
+                                    <span 
+                                        onClick={(e) => toggleFavorite(e, movie._id)}
+                                        style={{cursor: 'pointer', color: favoriteIds.includes(movie._id) ? '#ff4081' : '#ccc', fontSize: '1.5rem', lineHeight: '1'}}
+                                        title={favoriteIds.includes(movie._id) ? "Remove from Favorites" : "Add to Favorites"}
+                                    >
+                                        {favoriteIds.includes(movie._id) ? '♥' : '♡'}
+                                    </span>
+                                )}
                             </div>
 
                             {/* 상단: 선명한 포스터 이미지 (링크 포함) */}
