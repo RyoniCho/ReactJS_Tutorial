@@ -14,6 +14,11 @@ function EditMovie() {
 
     // mainMoviePaths: { '720p': '', '1080p': '', '4k': '' }
     const [mainMoviePaths, setMainMoviePaths] = useState({ '720p': '', '1080p': '', '4k': '' });
+    
+    // Series Support
+    const [isSeries, setIsSeries] = useState(false);
+    const [episodes, setEpisodes] = useState([]); // [{ title: '', video: { '720p': '', '1080p': '', '4k': '' }, sub: '' }]
+
     // 이미지/추가이미지 상태
     const [imageUrl, setImageUrl] = useState('');
     const [imageFile, setImageFile] = useState(null);
@@ -52,6 +57,18 @@ function EditMovie() {
                         '4k': data.mainMovie['4k'] || ''
                     });
                 }
+                
+                // Series Data
+                setIsSeries(!!data.isSeries);
+                if (data.episodes && Array.isArray(data.episodes)) {
+                    setEpisodes(data.episodes.map(ep => ({
+                        title: ep.title || '',
+                        description: ep.description || '',
+                        video: ep.video || {},
+                        sub: ep.sub || ''
+                    })));
+                }
+
                 // image/extraImage 상태 초기화 (uploads/로 시작하면 서버 URL 붙이기)
                 setImageUrl(data.image ? (data.image.startsWith('uploads/') ? `${Config.apiUrl}/${data.image}` : data.image) : '');
                 setImageFile(null);
@@ -105,6 +122,10 @@ function EditMovie() {
         formData.append('mainMovie', JSON.stringify(mainMoviePaths));
         formData.append('mainMovieSub', movie.mainMovieSub || '');
         formData.append('trailer', movie.trailer);
+
+        // Series Data
+        formData.append('isSeries', isSeries);
+        formData.append('episodes', JSON.stringify(episodes));
 
         // 이미지 처리
         if (imageFile) {
@@ -198,11 +219,89 @@ function EditMovie() {
             ))}
             <button type="button" onClick={() => setExtraImages(prev => [...prev, { url: '', file: null }])}>추가 이미지 추가</button>
 
-            <label>Main Movie (화질별 경로)</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 12 }}>
-                <input type="text" placeholder="720p 경로" value={mainMoviePaths['720p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '720p': e.target.value }))} />
-                <input type="text" placeholder="1080p 경로" value={mainMoviePaths['1080p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '1080p': e.target.value }))} />
-                <input type="text" placeholder="4K 경로" value={mainMoviePaths['4k']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '4k': e.target.value }))} />
+            <div style={{marginTop: '20px', marginBottom: '20px'}}>
+                <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
+                    <label className="switch" style={{marginRight: '10px', display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+                        <input
+                            type="checkbox"
+                            checked={isSeries}
+                            onChange={(e) => setIsSeries(e.target.checked)}
+                            style={{marginRight: '8px', transform: 'scale(1.2)'}}
+                        />
+                        <span style={{fontSize: '1.1em', fontWeight: 'bold'}}>Series Mode</span>
+                    </label>
+                </div>
+
+                {isSeries ? (
+                    <div style={{marginTop: '10px', borderLeft: '3px solid #1976d2', paddingLeft: '15px'}}>
+                        {episodes.map((ep, idx) => (
+                            <div key={idx} style={{marginBottom: '20px', padding: '15px', backgroundColor: '#2a2a2a', borderRadius: '8px'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
+                                    <h4 style={{margin: 0}}>Episode {idx + 1}</h4>
+                                    <button type="button" onClick={() => setEpisodes(prev => prev.filter((_, i) => i !== idx))} style={{backgroundColor: '#d32f2f', color: 'white', border: 'none', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer'}}>Remove</button>
+                                </div>
+                                
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{display: 'block', marginBottom: '4px', fontSize: '0.9em', color: '#aaa'}}>Title</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Episode Title" 
+                                        value={ep.title} 
+                                        onChange={e => {
+                                            const newEps = [...episodes];
+                                            newEps[idx].title = e.target.value;
+                                            setEpisodes(newEps);
+                                        }}
+                                        style={{width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#333', color: 'white'}}
+                                    />
+                                </div>
+
+                                <div style={{marginBottom: '10px'}}>
+                                    <label style={{display: 'block', marginBottom: '4px', fontSize: '0.9em', color: '#aaa'}}>Description (Optional)</label>
+                                    <textarea 
+                                        placeholder="Episode Description" 
+                                        value={ep.description || ''} 
+                                        onChange={e => {
+                                            const newEps = [...episodes];
+                                            newEps[idx].description = e.target.value;
+                                            setEpisodes(newEps);
+                                        }}
+                                        style={{width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#333', color: 'white', minHeight: '60px', resize: 'vertical'}}
+                                    />
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    <label style={{fontSize: '0.9em', color: '#aaa'}}>Video Paths</label>
+                                    <input type="text" placeholder="720p Path" value={ep.video['720p'] || ''} onChange={e => {
+                                        const newEps = [...episodes];
+                                        newEps[idx].video = { ...newEps[idx].video, '720p': e.target.value };
+                                        setEpisodes(newEps);
+                                    }} style={{width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#333', color: 'white'}} />
+                                    <input type="text" placeholder="1080p Path" value={ep.video['1080p'] || ''} onChange={e => {
+                                        const newEps = [...episodes];
+                                        newEps[idx].video = { ...newEps[idx].video, '1080p': e.target.value };
+                                        setEpisodes(newEps);
+                                    }} style={{width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#333', color: 'white'}} />
+                                    <input type="text" placeholder="4K Path" value={ep.video['4k'] || ''} onChange={e => {
+                                        const newEps = [...episodes];
+                                        newEps[idx].video = { ...newEps[idx].video, '4k': e.target.value };
+                                        setEpisodes(newEps);
+                                    }} style={{width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #555', backgroundColor: '#333', color: 'white'}} />
+                                </div>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => setEpisodes(prev => [...prev, { title: `Episode ${prev.length + 1}`, description: '', video: {} }])} style={{width: '100%', padding: '10px', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold'}}>+ Add Episode</button>
+                    </div>
+                ) : (
+                    <div>
+                        <label>Main Movie (화질별 경로)</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 12 }}>
+                            <input type="text" placeholder="720p 경로" value={mainMoviePaths['720p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '720p': e.target.value }))} />
+                            <input type="text" placeholder="1080p 경로" value={mainMoviePaths['1080p']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '1080p': e.target.value }))} />
+                            <input type="text" placeholder="4K 경로" value={mainMoviePaths['4k']} onChange={e => setMainMoviePaths(prev => ({ ...prev, '4k': e.target.value }))} />
+                        </div>
+                    </div>
+                )}
             </div>
             <button type="submit">Save Changes</button>
         </form>

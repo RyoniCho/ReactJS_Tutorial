@@ -15,15 +15,26 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const [isFavorite, setIsFavorite] = useState(false);
 
     const [selectedQuality, setSelectedQuality] = useState('');
+    const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0);
+
     // availableQualities의 첫 번째 값으로 selectedQuality 자동 설정
     useEffect(() => {
-        if (movie && movie.mainMovie) {
-            const qualities = Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]);
+        if (movie) {
+            let qualities = [];
+            if (movie.isSeries && movie.episodes && movie.episodes.length > 0) {
+                const currentEp = movie.episodes[currentEpisodeIndex];
+                if (currentEp && currentEp.video) {
+                    qualities = Object.keys(currentEp.video).filter(q => currentEp.video[q]);
+                }
+            } else if (movie.mainMovie) {
+                qualities = Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]);
+            }
+
             if (qualities.length > 0 && !qualities.includes(selectedQuality)) {
                 setSelectedQuality(qualities[0]);
             }
         }
-    }, [movie]);
+    }, [movie, currentEpisodeIndex]);
 
     useEffect(() => {
 
@@ -131,10 +142,40 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         return `${Config.apiUrl}${normalizedPath.startsWith('/') ? '' : '/'}${normalizedPath}`;
     }
 
-    const handleDownload = async () => {
+    const handleDownload = async (epIdx = null) => {
         if (!selectedQuality) return;
-        const moviePath = movie.mainMovie[selectedQuality];
-        if (!moviePath) return;
+        
+        let moviePath = '';
+        let filename = '';
+        
+        // If epIdx is provided (from list click), use that episode
+        // Otherwise use currentEpisodeIndex (from player/state)
+        const targetIndex = (epIdx !== null) ? epIdx : currentEpisodeIndex;
+
+        if (movie.isSeries && movie.episodes && movie.episodes.length > 0) {
+            const currentEp = movie.episodes[targetIndex];
+            // Check if selectedQuality exists for this episode
+            if (currentEp.video[selectedQuality]) {
+                moviePath = currentEp.video[selectedQuality];
+            } else {
+                // Fallback to first available quality
+                const available = Object.keys(currentEp.video).filter(q => currentEp.video[q]);
+                if (available.length > 0) {
+                    moviePath = currentEp.video[available[0]];
+                    // Optionally alert user about quality change?
+                }
+            }
+            
+            filename = `${movie.serialNumber}_Ep${targetIndex + 1}_${selectedQuality}.mp4`;
+        } else {
+            moviePath = movie.mainMovie[selectedQuality];
+            filename = `${movie.serialNumber}_${selectedQuality}.mp4`;
+        }
+
+        if (!moviePath) {
+            alert('Selected quality not available for this file.');
+            return;
+        }
 
         const accessToken = localStorage.getItem('accessToken');
         
@@ -146,7 +187,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         // a 태그를 사용하여 다운로드 트리거 (가장 안정적인 방법)
         const link = document.createElement('a');
         link.href = downloadUrl;
-        link.setAttribute('download', `${movie.serialNumber}_${selectedQuality}.mp4`); // 파일명 힌트
+        link.setAttribute('download', filename); // 파일명 힌트
         document.body.appendChild(link);
         link.click();
         
@@ -156,7 +197,30 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
     if (!movie) return <div>Loading...</div>;
     
-    const availableQualities = movie.mainMovie ? Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]) : [];
+    let availableQualities = [];
+    let currentVideoSrc = '';
+    let currentSubSrc = '';
+
+    if (movie.isSeries && movie.episodes && movie.episodes.length > 0) {
+        const currentEp = movie.episodes[currentEpisodeIndex];
+        if (currentEp && currentEp.video) {
+            availableQualities = Object.keys(currentEp.video).filter(q => currentEp.video[q]);
+            if (selectedQuality && currentEp.video[selectedQuality]) {
+                currentVideoSrc = `${Config.apiUrl}/api/stream?file=${currentEp.video[selectedQuality]}&resolution=${selectedQuality}`;
+            }
+            if (currentEp.sub) {
+                currentSubSrc = `${Config.apiUrl}/api/${currentEp.sub}`;
+            }
+        }
+    } else if (movie.mainMovie) {
+        availableQualities = Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]);
+        if (selectedQuality && movie.mainMovie[selectedQuality]) {
+            currentVideoSrc = `${Config.apiUrl}/api/stream?file=${movie.mainMovie[selectedQuality]}&resolution=${selectedQuality}`;
+        }
+        if (movie.mainMovieSub) {
+            currentSubSrc = `${Config.apiUrl}/api/${movie.mainMovieSub}`;
+        }
+    }
    
 
     return (
@@ -221,23 +285,61 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
             {(movie.mainMovie!=='') ? <HLSVideoPlayer videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie}&resolution=720p`} subSrc={`${Config.apiUrl}/api/${movie.mainMovieSub}`} movieId={`${id}`}/> : <></>} */}
             {availableQualities.length > 0 && (
                 <>
-                    <h4>Main Movie</h4>
-                    <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center' }}>
-                        <label style={{marginRight: '5px'}}>화질 선택: </label>
+                    <h4>{movie.isSeries ? `Now Playing: Episode ${currentEpisodeIndex + 1}` : 'Main Movie'}</h4>
+                    
+                    <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        <label style={{marginRight: '5px'}}>Quality: </label>
                         <select value={selectedQuality} onChange={e => setSelectedQuality(e.target.value)} style={{marginRight: '10px'}}>
                             {availableQualities.map(q => (
                                 <option key={q} value={q}>{q}</option>
                             ))}
                         </select>
-                        <button onClick={handleDownload} style={{padding: '4px 10px', cursor: 'pointer', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px'}}>
-                            Download
-                        </button>
+                        {!movie.isSeries && (
+                            <button onClick={() => handleDownload()} style={{padding: '4px 10px', cursor: 'pointer', backgroundColor: '#1976d2', color: 'white', border: 'none', borderRadius: '4px'}}>
+                                Download
+                            </button>
+                        )}
                     </div>
+
                     <HLSVideoPlayer
-                        videoSrc={`${Config.apiUrl}/api/stream?file=${movie.mainMovie[selectedQuality]}&resolution=${selectedQuality}`}
-                        subSrc={movie.mainMovieSub ? `${Config.apiUrl}/api/${movie.mainMovieSub}` : ''}
-                        movieId={`${id}`}
+                        videoSrc={currentVideoSrc}
+                        subSrc={currentSubSrc}
+                        movieId={`${id}${movie.isSeries ? `_ep${currentEpisodeIndex}` : ''}`}
                     />
+
+                    {movie.isSeries && (
+                        <div className="episode-list">
+                            <h3 style={{marginTop: '20px', marginBottom: '10px'}}>Episodes</h3>
+                            {movie.episodes.map((ep, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className={`episode-item ${currentEpisodeIndex === idx ? 'active' : ''}`}
+                                    onClick={() => setCurrentEpisodeIndex(idx)}
+                                >
+                                    <div className="episode-thumbnail">
+                                        <img src={getImageUrl(movie.image)} alt={ep.title} />
+                                        <div className="play-icon">▶</div>
+                                    </div>
+                                    <div className="episode-info">
+                                        <span className="episode-number">{idx + 1}. {ep.title}</span>
+                                        {ep.description && <span className="episode-desc">{ep.description}</span>}
+                                    </div>
+                                    <div className="episode-action">
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDownload(idx);
+                                            }}
+                                            className="download-btn"
+                                            title="Download Episode"
+                                        >
+                                            ⇩
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
             </div>
