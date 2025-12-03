@@ -379,25 +379,48 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         handleFilterChange(newFilters);
     }
 
-    const ShowOwnedType = (plexRegistered, mainMovie) => {
-        // mainMovie의 값이 모두 비어있으면 보유X로 간주
-        const isAllEmpty = !mainMovie || typeof mainMovie !== 'object' || Object.keys(mainMovie).length === 0 || Object.values(mainMovie).every(v => !v);
-        if (plexRegistered && isAllEmpty) {
-            // plex만 보유, web 없음
-            return <img src={plexIcon} className="icon-small plex-icon" />;
+    const renderOwnedStatus = (movie) => {
+        const { plexRegistered, mainMovie, isSeries, episodes } = movie;
+        
+        let hasWeb = false;
+        let has4K = false;
+        let hasFullHD = false;
+
+        if (isSeries && episodes && episodes.length > 0) {
+            // Check if any episode has video
+            hasWeb = episodes.some(ep => ep.video && Object.values(ep.video).some(v => v));
+            
+            // Check for specific qualities across all episodes
+            has4K = episodes.some(ep => ep.video && (ep.video['4k'] || ep.video['2160p']));
+            hasFullHD = episodes.some(ep => ep.video && ep.video['1080p']);
+        } else {
+            // Check mainMovie
+            if (mainMovie && typeof mainMovie === 'object') {
+                hasWeb = Object.values(mainMovie).some(v => v);
+                has4K = mainMovie['4k'] || mainMovie['2160p'];
+                hasFullHD = mainMovie['1080p'];
+            }
         }
-        if (isAllEmpty) return null;
-        const hasWeb = Object.values(mainMovie).some(v => v);
-        const has4K = mainMovie['4k'] || mainMovie['2160p'];
-        const hasFullHD = mainMovie['1080p'];
+
+        if (!plexRegistered && !hasWeb) {
+            return 'X';
+        }
+
         return (
             <div>
-                {plexRegistered ? <img src={plexIcon} className="icon-small plex-icon" /> : null}
-                {hasWeb ? <img src={webIcon} className="icon-small" /> : null}
-                {has4K ? <img src={fourKIcon} className="icon-small" title="4K" /> : null}
-                {hasFullHD ? <img src={fullhdIcon} className="icon-small" title="FullHD" /> : null}
+                {plexRegistered ? <img src={plexIcon} className="icon-small plex-icon" alt="Plex" /> : null}
+                {hasWeb ? <img src={webIcon} className="icon-small" alt="Web" /> : null}
+                {has4K ? <img src={fourKIcon} className="icon-small" title="4K" alt="4K" /> : null}
+                {hasFullHD ? <img src={fullhdIcon} className="icon-small" title="FullHD" alt="FHD" /> : null}
             </div>
         );
+    }
+
+    const renderSubtitleStatus = (movie) => {
+        if (movie.isSeries && movie.episodes && movie.episodes.length > 0) {
+             return movie.episodes.some(ep => ep.sub) ? 'O' : 'X';
+        }
+        return movie.subscriptExist ? 'O' : 'X';
     }
 
     const getImageUrl = (imagePath) => {
@@ -507,14 +530,8 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
                                     <Link to={`/movies/${movie._id}`} className="movie-title-link">
                                         <h3>{movie.title}</h3>
                                     </Link>
-                                    <h4>보유여부: {
-                                        (!movie.plexRegistered && (
-                                            !movie.mainMovie || typeof movie.mainMovie !== 'object' || Object.keys(movie.mainMovie).length === 0 || Object.values(movie.mainMovie).every(v => !v)
-                                        ))
-                                            ? 'X'
-                                            : ShowOwnedType(movie.plexRegistered, movie.mainMovie)
-                                    }</h4>
-                                    <h4>자막유뮤: {movie.subscriptExist ? 'O':'X'}</h4>
+                                    <h4>보유여부: {renderOwnedStatus(movie)}</h4>
+                                    <h4>자막유뮤: {renderSubtitleStatus(movie)}</h4>
                                     <div className='release-date'>
                                         <h4>{GetReleaseDataStr(movie.releaseDate)} 출시</h4>
                                     </div>
