@@ -12,6 +12,37 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const navigate = useNavigate();
   const playbackStateRef = useRef({ movieId: null, episodeIndex: -1, src: null, time: 0 });
+  
+  // [AirPlay Sync] HLS 매니페스트에 자막이 포함되어 있는지 확인하는 상태
+  // 기본값은 false로 설정하여, 불필요한 <track> 태그로 인한 충돌을 방지합니다.
+  // 검사 결과 자막이 없다고 판단되면 true로 변경하여 <track>을 렌더링합니다.
+  const [useHtmlTrack, setUseHtmlTrack] = useState(false);
+
+  // HLS 매니페스트(m3u8)를 조회하여 내장 자막 여부 확인
+  useEffect(() => {
+    setUseHtmlTrack(false); // 소스 변경 시 초기화
+
+    if (videoSrc && (videoSrc.includes('.m3u8') || videoSrc.includes('/api/stream'))) {
+      axios.get(videoSrc)
+        .then(response => {
+          const content = response.data;
+          if (typeof content === 'string' && content.includes('#EXT-X-MEDIA:TYPE=SUBTITLES')) {
+            console.log("[HLS] Embedded subtitles detected. Skipping <track> tag.");
+            setUseHtmlTrack(false);
+          } else {
+            console.log("[HLS] No embedded subtitles found. Enabling <track> tag fallback.");
+            setUseHtmlTrack(true);
+          }
+        })
+        .catch(err => {
+          console.warn("[HLS] Failed to probe manifest, falling back to <track> tag:", err);
+          setUseHtmlTrack(true);
+        });
+    } else {
+      // HLS가 아닌 경우(예: mp4 직접 재생)에는 항상 track 태그 사용
+      setUseHtmlTrack(true);
+    }
+  }, [videoSrc]);
 
   // 토큰 만료 체크 함수
   const isTokenExpired = (token) => {
@@ -160,7 +191,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
     <div>
       <video ref={videoRef} id="my-video" controls width="100%" playsInline>
         {
-          (subSrc && subSrc.includes(".vtt")) ? <track kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
+          (useHtmlTrack && subSrc && subSrc.includes(".vtt")) ? <track kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
         }
       </video>
     </div>
