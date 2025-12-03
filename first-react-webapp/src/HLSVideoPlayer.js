@@ -6,12 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 
-function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
+function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   const videoRef = useRef(null);
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const navigate = useNavigate();
-  const playbackStateRef = useRef({ movieId: null, src: null, time: 0 });
+  const playbackStateRef = useRef({ movieId: null, episodeIndex: -1, src: null, time: 0 });
 
   // 토큰 만료 체크 함수
   const isTokenExpired = (token) => {
@@ -35,8 +35,10 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     // 화질 변경 시 재생 위치 유지를 위한 로직
     let startTime = 0;
 
-    // 같은 영화이면서 소스(화질)만 변경된 경우에만 재생 위치 복원
-    if (playbackStateRef.current.movieId === movieId && playbackStateRef.current.src !== videoSrc) {
+    // 같은 영화, 같은 에피소드이면서 소스(화질)만 변경된 경우에만 재생 위치 복원
+    if (playbackStateRef.current.movieId === movieId && 
+        playbackStateRef.current.episodeIndex === episodeIndex &&
+        playbackStateRef.current.src !== videoSrc) {
         startTime = playbackStateRef.current.time;
     }
 
@@ -66,6 +68,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
         // 현재 상태 저장 (다음 렌더링 시 비교용)
         playbackStateRef.current = {
             movieId: movieId,
+            episodeIndex: episodeIndex,
             src: videoSrc,
             time: video.currentTime
         };
@@ -80,7 +83,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
         video.removeAttribute('src');
         video.load();
     };
-  }, [videoSrc, movieId]);
+  }, [videoSrc, movieId, episodeIndex]);
 
   // 시청 기록 조회
   useEffect(() => {
@@ -89,7 +92,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
     const fetchWatchHistory = async () => {
       try {
         const res = await axios.get(
-          `${Config.apiUrl}/api/watch-history?movieId=${movieId}`,
+          `${Config.apiUrl}/api/watch-history?movieId=${movieId}&episodeIndex=${episodeIndex}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (res.data.lastWatchedTime > 0) {
@@ -99,7 +102,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
       } catch (err) {}
     };
     fetchWatchHistory();
-  }, [movieId]);
+  }, [movieId, episodeIndex]);
 
   // 일정 간격마다 재생 위치 저장
   useEffect(() => {
@@ -110,13 +113,13 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId }) {
       if (video && !video.paused) {
         axios.post(
           `${Config.apiUrl}/api/watch-history`,
-          { movieId, lastWatchedTime: Math.floor(video.currentTime) },
+          { movieId, lastWatchedTime: Math.floor(video.currentTime), episodeIndex },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
     }, 10000); // 10초마다 저장
     return () => clearInterval(interval);
-  }, [movieId]);
+  }, [movieId, episodeIndex]);
 
   // 초를 hh:mm:ss로 변환하는 함수
   const formatTime = (seconds) => {

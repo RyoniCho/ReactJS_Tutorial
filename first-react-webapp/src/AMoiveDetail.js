@@ -304,7 +304,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <HLSVideoPlayer
                         videoSrc={currentVideoSrc}
                         subSrc={currentSubSrc}
-                        movieId={`${id}${movie.isSeries ? `_ep${currentEpisodeIndex}` : ''}`}
+                        movieId={id}
+                        episodeIndex={movie.isSeries ? currentEpisodeIndex : -1}
                     />
 
                     {movie.isSeries && (
