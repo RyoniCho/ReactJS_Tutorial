@@ -100,21 +100,15 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
                 // 여기서는 간단히 'label'이 같을 수 있으므로, 
                 // 우리가 넣은 <track>을 찾아서 켜주는 로직을 수행.
                 
-                // 만약 track.id가 지원된다면 베스트. 지원 안된다면 label로 구분하되,
-                // HLS 자막도 "Korean"일 수 있음.
-                
-                // 따라서, 아래 <track> 태그에 id="local-sub"를 추가하고,
-                // 여기서 track.id === "local-sub" 인 것을 찾아서 mode = "showing"
-                // 나머지는 mode = "disabled"
-                
                 if (track.kind === 'subtitles') {
-                    if (track.id === 'local-sub') {
+                    // [Label Check] id가 불안정할 수 있으므로 Label로 확실하게 구분
+                    if (track.label === 'Korean (Local)') {
                         track.mode = 'showing';
                         console.log("[Local Safari] Enabled local <track> subtitle.");
                     } else {
-                        // HLS 내장 자막 등
+                        // HLS 내장 자막 등 (보통 "Korean"으로 되어 있음)
                         track.mode = 'disabled';
-                        console.log("[Local Safari] Disabled HLS embedded subtitle to prevent seeking issues.");
+                        console.log(`[Local Safari] Disabled subtitle track: ${track.label}`);
                     }
                 }
             }
@@ -232,7 +226,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
     <div>
       <video ref={videoRef} id="my-video" controls width="100%" playsInline>
         {
-          (subSrc && subSrc.includes(".vtt")) ? <track id="local-sub" kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
+          (subSrc && subSrc.includes(".vtt")) ? <track id="local-sub" kind="subtitles" srclang="ko" label="Korean (Local)" src={subSrc} default /> : <></>
         }
       </video>
     </div>
