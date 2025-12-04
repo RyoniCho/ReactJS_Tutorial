@@ -12,37 +12,36 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const navigate = useNavigate();
   const playbackStateRef = useRef({ movieId: null, episodeIndex: -1, src: null, time: 0 });
+
+  // [Hybrid Subtitle Strategy]
+  // 1. 로컬 브라우저: <track> 태그 사용 (탐색 시 끊김 없음, 안정적)
+  // 2. AirPlay: HLS 매니페스트 내장 자막 사용 (AirPlay는 <track>을 무시하고 매니페스트를 직접 로드함)
+  // 따라서 두 가지를 모두 제공하면, 각 환경에 맞는 최적의 자막이 자동으로 선택됩니다.
   
-  // [AirPlay Sync] HLS 매니페스트에 자막이 포함되어 있는지 확인하는 상태
-  // 기본값은 false로 설정하여, 불필요한 <track> 태그로 인한 충돌을 방지합니다.
-  // 검사 결과 자막이 없다고 판단되면 true로 변경하여 <track>을 렌더링합니다.
-  const [useHtmlTrack, setUseHtmlTrack] = useState(false);
-
-  // HLS 매니페스트(m3u8)를 조회하여 내장 자막 여부 확인
+  // AirPlay 상태 감지 및 로깅
   useEffect(() => {
-    setUseHtmlTrack(false); // 소스 변경 시 초기화
+    const video = videoRef.current;
+    if (!video) return;
 
-    if (videoSrc && (videoSrc.includes('.m3u8') || videoSrc.includes('/api/stream'))) {
-      axios.get(videoSrc)
-        .then(response => {
-          const content = response.data;
-          if (typeof content === 'string' && content.includes('#EXT-X-MEDIA:TYPE=SUBTITLES')) {
-            console.log("[HLS] Embedded subtitles detected. Skipping <track> tag.");
-            setUseHtmlTrack(false);
-          } else {
-            console.log("[HLS] No embedded subtitles found. Enabling <track> tag fallback.");
-            setUseHtmlTrack(true);
-          }
-        })
-        .catch(err => {
-          console.warn("[HLS] Failed to probe manifest, falling back to <track> tag:", err);
-          setUseHtmlTrack(true);
-        });
-    } else {
-      // HLS가 아닌 경우(예: mp4 직접 재생)에는 항상 track 태그 사용
-      setUseHtmlTrack(true);
+    const handleAirPlayChange = (e) => {
+        if (video.webkitCurrentPlaybackTargetIsWireless) {
+            console.log("[AirPlay] Wireless playback active. Subtitles will be handled by Apple TV (HLS Manifest).");
+        } else {
+            console.log("[AirPlay] Local playback active. Using <track> tag for better seeking performance.");
+        }
+    };
+
+    // Safari 전용 이벤트 리스너
+    if (window.WebKitPlaybackTargetAvailabilityEvent) {
+        video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged', handleAirPlayChange);
     }
-  }, [videoSrc]);
+
+    return () => {
+        if (window.WebKitPlaybackTargetAvailabilityEvent) {
+            video.removeEventListener('webkitcurrentplaybacktargetiswirelesschanged', handleAirPlayChange);
+        }
+    };
+  }, []);
 
   // 토큰 만료 체크 함수
   const isTokenExpired = (token) => {
@@ -77,6 +76,48 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
         console.log("Video ready to play (Safari native HLS).");
         if (startTime > 0) {
             video.currentTime = startTime;
+        }
+
+        // [Local Safari Fix] HLS 내장 자막(탐색 시 끊김)을 비활성화하고, <track> 자막(안정적)을 강제 선택
+        const textTracks = video.textTracks;
+        if (textTracks) {
+            for (let i = 0; i < textTracks.length; i++) {
+                const track = textTracks[i];
+                // <track id="local-sub"> 태그와 연결된 트랙인지 확인
+                // (Safari에서는 track 요소의 id가 TextTrack 객체에 반영되지 않을 수 있으므로, 라벨이나 기타 속성으로 보완 확인 가능하지만,
+                //  가장 확실한 건 우리가 넣은 track을 제외한 나머지를 끄는 것)
+                
+                // 여기서는 <track> 태그에 id="local-sub"를 주었으므로, 이를 식별 시도.
+                // 만약 id가 전달되지 않는다면, mode='showing'인 것을 찾거나 해야 함.
+                
+                // 전략: 모든 자막 트랙을 일단 disabled로 만들고, 우리가 원하는 것만 showing으로 변경?
+                // 하지만 DOM의 <track> 요소가 로드되는 시점과 HLS 파싱 시점이 다를 수 있음.
+                
+                // 더 안전한 방법: 
+                // HLS 자막은 보통 in-band로 들어오며 DOM 요소가 없음.
+                // <track> 태그는 DOM 요소가 있음.
+                
+                // 여기서는 간단히 'label'이 같을 수 있으므로, 
+                // 우리가 넣은 <track>을 찾아서 켜주는 로직을 수행.
+                
+                // 만약 track.id가 지원된다면 베스트. 지원 안된다면 label로 구분하되,
+                // HLS 자막도 "Korean"일 수 있음.
+                
+                // 따라서, 아래 <track> 태그에 id="local-sub"를 추가하고,
+                // 여기서 track.id === "local-sub" 인 것을 찾아서 mode = "showing"
+                // 나머지는 mode = "disabled"
+                
+                if (track.kind === 'subtitles') {
+                    if (track.id === 'local-sub') {
+                        track.mode = 'showing';
+                        console.log("[Local Safari] Enabled local <track> subtitle.");
+                    } else {
+                        // HLS 내장 자막 등
+                        track.mode = 'disabled';
+                        console.log("[Local Safari] Disabled HLS embedded subtitle to prevent seeking issues.");
+                    }
+                }
+            }
         }
     };
 
@@ -191,7 +232,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
     <div>
       <video ref={videoRef} id="my-video" controls width="100%" playsInline>
         {
-          (useHtmlTrack && subSrc && subSrc.includes(".vtt")) ? <track kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
+          (subSrc && subSrc.includes(".vtt")) ? <track id="local-sub" kind="subtitles" srclang="ko" label="Korean" src={subSrc} default /> : <></>
         }
       </video>
     </div>
