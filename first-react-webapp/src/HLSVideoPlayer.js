@@ -234,7 +234,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
 
     return languages.map((lang, index) => (
         <track 
-            key={lang.code}
+            key={`${lang.code}-${subSrc}`} 
             id={`local-sub-${lang.code}`}
             kind="subtitles" 
             srclang={lang.code} 
