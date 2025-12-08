@@ -72,52 +72,47 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
         startTime = playbackStateRef.current.time;
     }
 
-    const onLoadedMetadata = () => {
-        console.log("Video ready to play (Safari native HLS).");
-        if (startTime > 0) {
-            video.currentTime = startTime;
-        }
-
-        // [Local Safari Fix] HLS 내장 자막(탐색 시 끊김)을 비활성화하고, <track> 자막(안정적)을 강제 선택
+    // 자막 트랙 설정 함수 (공통)
+    const configureTextTracks = () => {
         const textTracks = video.textTracks;
-        if (textTracks) {
-            for (let i = 0; i < textTracks.length; i++) {
-                const track = textTracks[i];
-                // <track id="local-sub"> 태그와 연결된 트랙인지 확인
-                // (Safari에서는 track 요소의 id가 TextTrack 객체에 반영되지 않을 수 있으므로, 라벨이나 기타 속성으로 보완 확인 가능하지만,
-                //  가장 확실한 건 우리가 넣은 track을 제외한 나머지를 끄는 것)
-                
-                // 여기서는 <track> 태그에 id="local-sub"를 주었으므로, 이를 식별 시도.
-                // 만약 id가 전달되지 않는다면, mode='showing'인 것을 찾거나 해야 함.
-                
-                // 전략: 모든 자막 트랙을 일단 disabled로 만들고, 우리가 원하는 것만 showing으로 변경?
-                // 하지만 DOM의 <track> 요소가 로드되는 시점과 HLS 파싱 시점이 다를 수 있음.
-                
-                // 더 안전한 방법: 
-                // HLS 자막은 보통 in-band로 들어오며 DOM 요소가 없음.
-                // <track> 태그는 DOM 요소가 있음.
-                
-                // 여기서는 간단히 'label'이 같을 수 있으므로, 
-                // 우리가 넣은 <track>을 찾아서 켜주는 로직을 수행.
-                
-                if (track.kind === 'subtitles') {
-                    // [Label Check] id가 불안정할 수 있으므로 Label로 확실하게 구분
+        if (!textTracks) return;
+
+        console.log(`[VideoPlayer] Configuring text tracks. Total tracks: ${textTracks.length}`);
+
+        for (let i = 0; i < textTracks.length; i++) {
+            const track = textTracks[i];
+            if (track.kind === 'subtitles') {
+                // [Label Check] 로컬 트랙 식별
+                if (track.label && track.label.includes('(Local)')) {
+                    // 로컬 트랙은 유지 (기본값인 한국어만 활성화)
                     if (track.label === 'Korean (Local)') {
                         track.mode = 'showing';
-                        console.log("[Local Safari] Enabled local <track> subtitle.");
-                    } else {
-                        // HLS 내장 자막 등 (보통 "Korean"으로 되어 있음)
-                        track.mode = 'disabled';
-                        console.log(`[Local Safari] Disabled subtitle track: ${track.label}`);
+                        console.log(`[VideoPlayer] Enabled local <track>: ${track.label}`);
                     }
+                } else {
+                    // HLS 내장 자막 등 비활성화 (중복 방지)
+                    track.mode = 'disabled';
+                    console.log(`[VideoPlayer] Disabled subtitle track: ${track.label}`);
                 }
             }
         }
     };
 
+    const onLoadedMetadata = () => {
+        console.log("Video metadata loaded.");
+        // Safari는 startPosition 옵션이 없으므로 수동으로 이동
+        if (isSafari && startTime > 0) {
+            video.currentTime = startTime;
+        }
+        configureTextTracks();
+    };
+
+    // 모든 브라우저에서 메타데이터 로드 시 자막 설정 실행
+    video.addEventListener('loadedmetadata', onLoadedMetadata);
+
     if (isSafari && video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = videoSrc;
-      video.addEventListener('loadedmetadata', onLoadedMetadata, { once: true });
+      // loadedmetadata 리스너는 위에서 이미 등록됨
     } else if (Hls.isSupported()) {
       // startPosition을 명시적으로 설정하여 EVENT 타입 플레이리스트에서도 처음부터 재생되도록 강제
       hls = new Hls({
@@ -127,6 +122,8 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log("Video ready to play (HLS.js).");
+        // HLS.js 로드 완료 후에도 자막 설정 한 번 더 확인
+        configureTextTracks();
       });
     }
 
@@ -142,9 +139,9 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
         if (hls) {
             hls.destroy();
         }
-        if (isSafari) {
-             video.removeEventListener('loadedmetadata', onLoadedMetadata);
-        }
+        
+        video.removeEventListener('loadedmetadata', onLoadedMetadata);
+        
         // 소스 변경 시 비디오 태그 초기화 (잔여 버퍼 제거)
         video.removeAttribute('src');
         video.load();
@@ -222,12 +219,36 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
     };
   }, [showResumePrompt, lastWatchedTime, navigate]);
 
+  const renderSubtitles = () => {
+    if (!subSrc || !subSrc.includes(".vtt")) return null;
+    
+    // 다국어 자막 지원을 위한 트랙 목록
+    // 파일이 실제로 존재하는지 확인하지 않고, 규칙에 따라 URL을 생성하여 태그를 추가합니다.
+    // 브라우저는 존재하지 않는 파일에 대해 404를 무시하거나 빈 트랙으로 처리합니다.
+    const languages = [
+        { code: 'ko', label: 'Korean (Local)', suffix: '' }, // 기본값 (파일명.vtt)
+        { code: 'en', label: 'English (Local)', suffix: '.en' }, // 파일명.en.vtt
+        { code: 'ja', label: 'Japanese (Local)', suffix: '.ja' }, // 파일명.ja.vtt
+        { code: 'zh', label: 'Chinese (Local)', suffix: '.zh' }, // 파일명.zh.vtt
+    ];
+
+    return languages.map((lang, index) => (
+        <track 
+            key={lang.code}
+            id={`local-sub-${lang.code}`}
+            kind="subtitles" 
+            srclang={lang.code} 
+            label={lang.label} 
+            src={subSrc.replace('.vtt', `${lang.suffix}.vtt`)} 
+            default={index === 0} 
+        />
+    ));
+  };
+
   return (
     <div>
       <video ref={videoRef} id="my-video" controls width="100%" playsInline>
-        {
-          (subSrc && subSrc.includes(".vtt")) ? <track id="local-sub" kind="subtitles" srclang="ko" label="Korean (Local)" src={subSrc} default /> : <></>
-        }
+        {renderSubtitles()}
       </video>
     </div>
   );
