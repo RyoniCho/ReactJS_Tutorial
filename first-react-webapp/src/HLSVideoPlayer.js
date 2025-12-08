@@ -241,13 +241,14 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
             label={lang.label} 
             src={subSrc.replace('.vtt', `${lang.suffix}.vtt`)} 
             default={index === 0} 
+            onError={(e) => console.error(`[VideoPlayer] Track error for ${lang.label}:`, e)}
         />
     ));
   };
 
   return (
     <div>
-      <video ref={videoRef} id="my-video" controls width="100%" playsInline>
+      <video ref={videoRef} id="my-video" controls width="100%" playsInline crossOrigin="anonymous">
         {renderSubtitles()}
       </video>
     </div>
