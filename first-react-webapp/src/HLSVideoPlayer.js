@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 
-function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
+function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocalSubtitles = false }) {
   const videoRef = useRef(null);
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
@@ -229,6 +229,9 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   }, [showResumePrompt, lastWatchedTime, navigate]);
 
   const renderSubtitles = () => {
+    // 로컬 자막 사용 여부 확인 (기본값: false)
+    if (!useLocalSubtitles) return null;
+
     // AirPlay 활성화 시 로컬 트랙 렌더링 안 함 (HLS 매니페스트 자막 사용)
     if (isAirPlayActive) return null;
 
