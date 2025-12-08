@@ -81,39 +81,12 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
         startTime = playbackStateRef.current.time;
     }
 
-    // 자막 트랙 설정 함수 (공통)
-    const configureTextTracks = () => {
-        const textTracks = video.textTracks;
-        if (!textTracks) return;
-
-        console.log(`[VideoPlayer] Configuring text tracks. Total tracks: ${textTracks.length}`);
-
-        for (let i = 0; i < textTracks.length; i++) {
-            const track = textTracks[i];
-            if (track.kind === 'subtitles') {
-                // [Label Check] 로컬 트랙 식별
-                if (track.label && track.label.includes('(Local)')) {
-                    // 로컬 트랙은 유지 (기본값인 한국어만 활성화)
-                    if (track.label === 'Korean (Local)') {
-                        track.mode = 'showing';
-                        console.log(`[VideoPlayer] Enabled local <track>: ${track.label}`);
-                    }
-                } else {
-                    // HLS 내장 자막 등 비활성화 (중복 방지)
-                    track.mode = 'disabled';
-                    console.log(`[VideoPlayer] Disabled subtitle track: ${track.label}`);
-                }
-            }
-        }
-    };
-
     const onLoadedMetadata = () => {
         console.log("Video metadata loaded.");
         // Safari는 startPosition 옵션이 없으므로 수동으로 이동
         if (isSafari && startTime > 0) {
             video.currentTime = startTime;
         }
-        configureTextTracks();
     };
 
     // 모든 브라우저에서 메타데이터 로드 시 자막 설정 실행
@@ -131,8 +104,6 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log("Video ready to play (HLS.js).");
-        // HLS.js 로드 완료 후에도 자막 설정 한 번 더 확인
-        configureTextTracks();
       });
     }
 
@@ -156,6 +127,73 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
         video.load();
     };
   }, [videoSrc, movieId, episodeIndex]);
+
+  // 자막 트랙 관리 (로컬 vs HLS)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateTracks = () => {
+      const textTracks = video.textTracks;
+      if (!textTracks) return;
+
+      // console.log(`[VideoPlayer] Updating tracks. Mode: ${useLocalSubtitles ? 'Local' : 'HLS/AirPlay'}`);
+
+      for (let i = 0; i < textTracks.length; i++) {
+        const track = textTracks[i];
+        if (track.kind === 'subtitles') {
+          const isLocal = track.label && track.label.includes('(Local)');
+
+          if (useLocalSubtitles) {
+            // [로컬 자막 모드]
+            if (isLocal) {
+              // 로컬 트랙: 기본값(한국어) 활성화
+              if (track.mode === 'disabled') {
+                  track.mode = 'hidden'; 
+              }
+              if (track.label === 'Korean (Local)' && track.mode !== 'showing') {
+                 track.mode = 'showing';
+              }
+            } else {
+              // HLS 트랙: 숨김/비활성화 (로컬과 중복 방지)
+              track.mode = 'disabled';
+            }
+          } else {
+            // [HLS/AirPlay 모드]
+            if (isLocal) {
+              // 로컬 트랙: 비활성화
+              track.mode = 'disabled';
+            } else {
+              // HLS 트랙: 활성화 (선택 가능하도록)
+              if (track.mode === 'disabled') {
+                track.mode = 'hidden'; // hidden = 로드됨, 보이지 않음 (메뉴에서 선택 가능)
+                
+                // 편의를 위해 한국어 자동 선택
+                if (track.label === 'Korean') {
+                    track.mode = 'showing';
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+
+    // 초기 실행
+    updateTracks();
+
+    // 트랙 변경 감지 (HLS 로드 시점 등 대응)
+    const textTracks = video.textTracks;
+    if (textTracks) {
+        textTracks.addEventListener('addtrack', updateTracks);
+    }
+
+    return () => {
+        if (textTracks) {
+            textTracks.removeEventListener('addtrack', updateTracks);
+        }
+    };
+  }, [useLocalSubtitles, videoSrc]);
 
   // 시청 기록 조회
   useEffect(() => {
