@@ -10,6 +10,7 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   const videoRef = useRef(null);
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [isAirPlayActive, setIsAirPlayActive] = useState(false);
   const navigate = useNavigate();
   const playbackStateRef = useRef({ movieId: null, episodeIndex: -1, src: null, time: 0 });
 
@@ -24,12 +25,20 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
     if (!video) return;
 
     const handleAirPlayChange = (e) => {
-        if (video.webkitCurrentPlaybackTargetIsWireless) {
+        const isWireless = video.webkitCurrentPlaybackTargetIsWireless;
+        setIsAirPlayActive(isWireless);
+        
+        if (isWireless) {
             console.log("[AirPlay] Wireless playback active. Subtitles will be handled by Apple TV (HLS Manifest).");
         } else {
             console.log("[AirPlay] Local playback active. Using <track> tag for better seeking performance.");
         }
     };
+
+    // 초기 상태 확인
+    if (video.webkitCurrentPlaybackTargetIsWireless !== undefined) {
+        setIsAirPlayActive(video.webkitCurrentPlaybackTargetIsWireless);
+    }
 
     // Safari 전용 이벤트 리스너
     if (window.WebKitPlaybackTargetAvailabilityEvent) {
@@ -220,6 +229,9 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1 }) {
   }, [showResumePrompt, lastWatchedTime, navigate]);
 
   const renderSubtitles = () => {
+    // AirPlay 활성화 시 로컬 트랙 렌더링 안 함 (HLS 매니페스트 자막 사용)
+    if (isAirPlayActive) return null;
+
     if (!subSrc || !subSrc.includes(".vtt")) return null;
     
     // 다국어 자막 지원을 위한 트랙 목록
