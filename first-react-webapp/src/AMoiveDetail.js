@@ -16,6 +16,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
     const [selectedQuality, setSelectedQuality] = useState('');
     const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0);
+    const [useLocalSubtitles, setUseLocalSubtitles] = useState(true);
 
     // availableQualities의 첫 번째 값으로 selectedQuality 자동 설정
     useEffect(() => {
@@ -288,6 +289,41 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     <h4>{movie.isSeries ? `Now Playing: Episode ${currentEpisodeIndex + 1}` : 'Main Movie'}</h4>
                     
                     <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        {/* Local Subtitles Toggle */}
+                        <div 
+                            onClick={() => setUseLocalSubtitles(!useLocalSubtitles)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                                marginRight: '15px',
+                                userSelect: 'none'
+                            }}
+                            title="Toggle Local Subtitles (Disable for AirPlay)"
+                        >
+                            <span style={{ fontSize: '12px', marginRight: '6px', color: '#666', fontWeight: 'bold' }}>Local Subs</span>
+                            <div style={{
+                                width: '32px',
+                                height: '18px',
+                                backgroundColor: useLocalSubtitles ? '#2196F3' : '#ccc',
+                                borderRadius: '18px',
+                                position: 'relative',
+                                transition: 'background-color 0.3s'
+                            }}>
+                                <div style={{
+                                    width: '14px',
+                                    height: '14px',
+                                    backgroundColor: 'white',
+                                    borderRadius: '50%',
+                                    position: 'absolute',
+                                    top: '2px',
+                                    left: useLocalSubtitles ? '16px' : '2px',
+                                    transition: 'left 0.3s',
+                                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                                }} />
+                            </div>
+                        </div>
+
                         <label style={{marginRight: '5px'}}>Quality: </label>
                         <select value={selectedQuality} onChange={e => setSelectedQuality(e.target.value)} style={{marginRight: '10px'}}>
                             {availableQualities.map(q => (
@@ -306,6 +342,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                         subSrc={currentSubSrc}
                         movieId={id}
                         episodeIndex={movie.isSeries ? currentEpisodeIndex : -1}
+                        useLocalSubtitles={useLocalSubtitles}
                     />
 
                     {movie.isSeries && (
