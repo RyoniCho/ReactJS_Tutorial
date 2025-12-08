@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Config from './Config';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Sidebar from './Sidebar';
 
@@ -19,6 +19,8 @@ function formatSeconds(sec) {
   ].filter(Boolean).join(':');
 }
 const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, isAuthenticated }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [histories, setHistories] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -27,7 +29,13 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   const [selectedActor, setSelectedActor] = useState(localStorage.getItem("selectedActor") || '');
   const [sortOrder, setSortOrder] = useState(localStorage.getItem("historySortOrder") || 'watchedDesc');
   const [owned, setOwned] = useState(localStorage.getItem("owned") || 'all');
-  const [selectedCategory, setSelectedCategory]= useState(localStorage.getItem("selectedCategory") || '');
+  
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+      const searchParams = new URLSearchParams(location.search);
+      const param = searchParams.get('category');
+      return param !== null ? param : (localStorage.getItem("selectedCategory") || '');
+  });
+
   const [subscriptExist, setSubscriptExist] = useState(localStorage.getItem("subscriptExist") || 'all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -75,6 +83,15 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   const handleSetSelectedCategory = (value) => {
       localStorage.setItem("selectedCategory", value);
       setSelectedCategory(value);
+
+      // Update URL
+      const searchParams = new URLSearchParams(location.search);
+      if (value) {
+          searchParams.set('category', value);
+      } else {
+          searchParams.delete('category');
+      }
+      navigate({ search: searchParams.toString() }, { replace: true });
   };
 
   const handleSetSubscriptExist = (value) => {
@@ -117,13 +134,12 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
 
         // Category
         if (selectedCategory) {
-            if (selectedCategory === "all") {
-                if (movie.category === "AdultVideo" && !isAuthenticated) return false;
-            } else if (movie.category !== selectedCategory) {
+            if (movie.category !== selectedCategory) {
                 return false;
             }
         } else {
-            if (movie.category === "AdultVideo" && !isAuthenticated) return false;
+            // No category selected (ALL) -> Exclude AdultVideo
+            if (movie.category === "AdultVideo") return false;
         }
 
         // Subscription

@@ -190,6 +190,14 @@ function App() {
             if (category) return category;
             return 'All Movie';
         }
+        if (location.pathname === '/latest-watched') {
+            const searchParams = new URLSearchParams(location.search);
+            const category = searchParams.get('category');
+            
+            if (category === 'AdultVideo') return 'Recent: Adult Video';
+            if (category) return `Recent: ${category}`;
+            return 'Recent: All Movie';
+        }
         return 'Control-Room';
     };
 
@@ -215,7 +223,7 @@ function App() {
                     
                     <nav className="header-nav">
                         <Link to="/">Home</Link>
-                        <Link to="/latest-watched">Recent</Link>
+                        <Link to={`/latest-watched${location.search}`}>Recent</Link>
                         <Link to="/favorites">Favorite</Link>
                         {isAuthenticated && loginRole === "admin" ? <Link to="/add">Add</Link> : <></>}
                         {isAuthenticated && loginRole === "admin" ? <Link to="/admin">Admin</Link> : <></>}
