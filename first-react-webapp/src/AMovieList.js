@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './Styles/AMovieList.css';
 import Config from './Config'
@@ -29,6 +29,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const [hasMore,setHasMore] = useState(true);
     const [initialFetch,setInitialFetch] = useState(false);
     const navigate = useNavigate(); 
+    const location = useLocation();
     const [favoriteIds, setFavoriteIds] = useState([]);
 
 
@@ -97,10 +98,13 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
     const getInitialFilterCachedValue = ()=>{
      
+        const searchParams = new URLSearchParams(location.search);
+        const categoryParam = searchParams.get('category');
+
         const cachedSortOrder = localStorage.getItem("sortorder");
         const cachedSelectedActor = localStorage.getItem("selectedActor");
         const cachedOwned= localStorage.getItem("owned");
-        const cachedSelectedCategory=localStorage.getItem("selectedCategory");
+        let cachedSelectedCategory=localStorage.getItem("selectedCategory");
         const cachedSubscriptExist = localStorage.getItem("subscriptExist");
 
         if(cachedSortOrder)
@@ -120,7 +124,11 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             setOwned(cachedOwned);
         }
 
-        if(cachedSelectedCategory)
+        if (categoryParam !== null) {
+            cachedSelectedCategory = categoryParam;
+            localStorage.setItem("selectedCategory", categoryParam);
+            setSelectedCategory(categoryParam);
+        } else if(cachedSelectedCategory)
         {
             setSelectedCategory(cachedSelectedCategory);
         }
@@ -368,6 +376,16 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
 
         localStorage.setItem("selectedCategory",value);
         setSelectedCategory(value);
+        
+        // URL 업데이트
+        const searchParams = new URLSearchParams(location.search);
+        if (value) {
+            searchParams.set('category', value);
+        } else {
+            searchParams.delete('category'); // ALL인 경우 파라미터 제거
+        }
+        navigate({ search: searchParams.toString() }, { replace: true });
+
         const newFilters = createFilters({ category: value });
         handleFilterChange(newFilters);
     }

@@ -4,6 +4,7 @@ import Config from './Config';
 import RegistInfo from "./RegistInfo";
 import AMovieList from './AMovieList';
 import AMovieDetail from "./AMoiveDetail";
+import Home from './Home';
 import { BrowserRouter as Router, Route, Routes,Link } from 'react-router-dom';
 import './Styles/App.css';
 import EditMovie from "./EditMovie";
@@ -180,6 +181,18 @@ function App() {
         
     }
 
+    const getHeaderTitle = () => {
+        if (location.pathname === '/list') {
+            const searchParams = new URLSearchParams(location.search);
+            const category = searchParams.get('category');
+            
+            if (category === 'AdultVideo') return 'Adult Video';
+            if (category) return category;
+            return 'All Movie';
+        }
+        return 'Control-Room';
+    };
+
  
 
   return (
@@ -188,7 +201,7 @@ function App() {
             <div className="app">
                 <header className="app-header">
                     <div className="header-left">
-                        {(location.pathname === '/' || location.pathname === '/latest-watched' || location.pathname === '/favorites') && (
+                        {(location.pathname === '/list' || location.pathname === '/latest-watched' || location.pathname === '/favorites') && (
                             <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -197,7 +210,7 @@ function App() {
                                 </svg>
                             </button>
                         )}
-                        <h1>Control-Room</h1>
+                        <h1>{getHeaderTitle()}</h1>
                     </div>
                     
                     <nav className="header-nav">
@@ -226,7 +239,8 @@ function App() {
                 
                 <div className="main-content">
                     <Routes>
-                        <Route path="/" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}/>} />
+                        <Route path="/" element={<Home />} />
+                        <Route path="/list" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}/>} />
                         <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
                         <Route path="/favorites" element={<Favorites isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
                         <Route path="/movies/:id" element={<AMovieDetail isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured}/>} />
