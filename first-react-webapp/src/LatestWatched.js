@@ -26,17 +26,16 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   
   // Filter States
   const [actors, setActors] = useState([]);
-  const [selectedActor, setSelectedActor] = useState(localStorage.getItem("selectedActor") || '');
-  const [sortOrder, setSortOrder] = useState(localStorage.getItem("historySortOrder") || 'watchedDesc');
-  const [owned, setOwned] = useState(localStorage.getItem("owned") || 'all');
+  const [selectedActor, setSelectedActor] = useState('');
+  const [sortOrder, setSortOrder] = useState('watchedDesc');
+  const [owned, setOwned] = useState('all');
   
   const [selectedCategory, setSelectedCategory] = useState(() => {
       const searchParams = new URLSearchParams(location.search);
-      const param = searchParams.get('category');
-      return param !== null ? param : (localStorage.getItem("selectedCategory") || '');
+      return searchParams.get('category') || '';
   });
 
-  const [subscriptExist, setSubscriptExist] = useState(localStorage.getItem("subscriptExist") || 'all');
+  const [subscriptExist, setSubscriptExist] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchHistories = () => {
@@ -64,24 +63,20 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
     fetchActors();
   }, []);
 
-  // Handlers to update state and localStorage
+  // Handlers to update state (No localStorage persistence for Recent)
   const handleSetSortOrder = (value) => {
-      localStorage.setItem("historySortOrder", value);
       setSortOrder(value);
   };
 
   const handleSetSelectedActor = (value) => {
-      localStorage.setItem("selectedActor", value);
       setSelectedActor(value);
   };
 
   const handleSetOwned = (value) => {
-      localStorage.setItem("owned", value);
       setOwned(value);
   };
 
   const handleSetSelectedCategory = (value) => {
-      localStorage.setItem("selectedCategory", value);
       setSelectedCategory(value);
 
       // Update URL
@@ -95,7 +90,6 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
   };
 
   const handleSetSubscriptExist = (value) => {
-      localStorage.setItem("subscriptExist", value);
       setSubscriptExist(value);
   };
 
@@ -204,6 +198,65 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
       { value: "asc", label: "오래된 개봉일 순" },
   ];
 
+  const renderActiveFilters = () => {
+      const filters = [];
+      if (selectedActor) filters.push({ label: `Actor: ${selectedActor}`, onRemove: () => handleSetSelectedActor('') });
+      if (owned !== 'all') filters.push({ label: `Owned: ${owned}`, onRemove: () => handleSetOwned('all') });
+      if (subscriptExist !== 'all') filters.push({ label: `Subtitles: ${subscriptExist === 'true' ? 'Yes' : 'No'}`, onRemove: () => handleSetSubscriptExist('all') });
+      if (sortOrder !== 'watchedDesc') filters.push({ label: `Sort: ${sortOrder}`, onRemove: () => handleSetSortOrder('watchedDesc') });
+
+      if (filters.length === 0) return null;
+
+      return (
+          <div className="active-filters" style={{ display: 'flex', gap: '10px', padding: '10px 20px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ color: '#888', fontSize: '0.9em', marginRight: '5px' }}>Active Filters:</span>
+              {filters.map((f, i) => (
+                  <span key={i} style={{ 
+                      background: 'rgba(255, 255, 255, 0.1)', 
+                      padding: '4px 12px', 
+                      borderRadius: '20px', 
+                      fontSize: '0.85em', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#eee'
+                  }}>
+                      {f.label}
+                      <button onClick={f.onRemove} style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: '#ff4081', 
+                          cursor: 'pointer', 
+                          fontWeight: 'bold',
+                          fontSize: '1.1em',
+                          padding: '0',
+                          lineHeight: '1',
+                          display: 'flex',
+                          alignItems: 'center'
+                      }}>×</button>
+                  </span>
+              ))}
+              <button onClick={() => {
+                  handleSetSelectedActor('');
+                  handleSetOwned('all');
+                  handleSetSubscriptExist('all');
+                  handleSetSortOrder('watchedDesc');
+              }} style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  color: '#aaa', 
+                  cursor: 'pointer', 
+                  textDecoration: 'underline', 
+                  fontSize: '0.85em',
+                  marginLeft: '5px'
+              }}>
+                  Clear All
+              </button>
+          </div>
+      );
+  };
+
   return (
     <div>
       <Sidebar
@@ -226,6 +279,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
             onSearchChange={(e) => setSearchTerm(e.target.value)}
             totalCount={filteredHistories.length}
       />
+      {renderActiveFilters()}
       <div className="movie-list">
         <div className="movies">
             {filteredHistories.length === 0 && !loading && (

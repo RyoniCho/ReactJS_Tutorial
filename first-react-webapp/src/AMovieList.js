@@ -96,59 +96,57 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     }, [currentPage]);
 
 
-    const getInitialFilterCachedValue = ()=>{
-     
+    const getStorageKey = (cat, key) => `filter_${cat || 'ALL'}_${key}`;
+
+    const getInitialFilterCachedValue = () => {
         const searchParams = new URLSearchParams(location.search);
         const categoryParam = searchParams.get('category');
 
-        const cachedSortOrder = localStorage.getItem("sortorder");
-        const cachedSelectedActor = localStorage.getItem("selectedActor");
-        const cachedOwned= localStorage.getItem("owned");
-        let cachedSelectedCategory=localStorage.getItem("selectedCategory");
-        const cachedSubscriptExist = localStorage.getItem("subscriptExist");
-
-        if(cachedSortOrder)
-        {
-            setSortOrder(cachedSortOrder);
-        }
-
-        if(cachedSelectedActor)
-        {
+        if (categoryParam) {
+            const key = (k) => getStorageKey(categoryParam, k);
             
-            setSelectedActor(cachedSelectedActor);
-           
-        }
+            const cachedSortOrder = localStorage.getItem(key("sortOrder"));
+            const cachedSelectedActor = localStorage.getItem(key("actor"));
+            const cachedOwned = localStorage.getItem(key("owned"));
+            const cachedSubscriptExist = localStorage.getItem(key("subscriptExist"));
 
-        if(cachedOwned)
-        {
-            setOwned(cachedOwned);
-        }
+            if (cachedSortOrder) setSortOrder(cachedSortOrder);
+            else setSortOrder('asc');
 
-        if (categoryParam !== null) {
-            cachedSelectedCategory = categoryParam;
-            localStorage.setItem("selectedCategory", categoryParam);
+            if (cachedSelectedActor) setSelectedActor(cachedSelectedActor);
+            else setSelectedActor('');
+
+            if (cachedOwned) setOwned(cachedOwned);
+            else setOwned('all');
+
+            if (cachedSubscriptExist) setSubscriptExist(cachedSubscriptExist);
+            else setSubscriptExist('all');
+
             setSelectedCategory(categoryParam);
-        } else if(cachedSelectedCategory)
-        {
-            setSelectedCategory(cachedSelectedCategory);
+
+            return createFilters({
+                actor: cachedSelectedActor || '',
+                owned: cachedOwned || 'all',
+                subscriptExist: cachedSubscriptExist || 'all',
+                category: categoryParam,
+                sortOrder: cachedSortOrder || 'asc'
+            });
+        } else {
+            // Home / No Category -> Reset
+            setSortOrder('asc');
+            setSelectedActor('');
+            setOwned('all');
+            setSubscriptExist('all');
+            setSelectedCategory('');
+
+            return createFilters({
+                actor: '',
+                owned: 'all',
+                subscriptExist: 'all',
+                category: '',
+                sortOrder: 'asc'
+            });
         }
-
-        if(cachedSubscriptExist)
-        {
-            setSubscriptExist(cachedSubscriptExist);
-        }
-
-        const newFilters = createFilters({ 
-            actor: cachedSelectedActor, 
-            owned:cachedOwned,
-            subscriptExist:cachedSubscriptExist,
-            category:cachedSelectedCategory,
-            sortOrder:cachedSortOrder
-        });
-
-        return newFilters;
-
-
     }
 
     const fetchMovies = async (query = '', filters = {}, page = 1, pageSize = 10) => {
@@ -348,35 +346,33 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
     const filteredMovies = movies;
 
     const HandleSetSortOrder=(value)=>{
-
-        localStorage.setItem("sortorder",value);
+        if (selectedCategory) {
+            localStorage.setItem(getStorageKey(selectedCategory, "sortOrder"), value);
+        }
         setSortOrder(value);
-        console.log("sort order :"+value);
         const newFilters = createFilters({ sortOrder: value });
         handleFilterChange(newFilters);
     }
     
     const HandleSetSelectedActor=(value)=>{
-
-        localStorage.setItem("selectedActor",value);
+        if (selectedCategory) {
+            localStorage.setItem(getStorageKey(selectedCategory, "actor"), value);
+        }
         setSelectedActor(value);
         const newFilters = createFilters({ actor: value });
         handleFilterChange(newFilters);
     }
 
     const HandleSetOwned=(value)=>{
-
-        localStorage.setItem("owned",value);
+        if (selectedCategory) {
+            localStorage.setItem(getStorageKey(selectedCategory, "owned"), value);
+        }
         setOwned(value);
         const newFilters = createFilters({ owned: value });
         handleFilterChange(newFilters);
     }
 
     const HandleSetSelectedCategory=(value)=>{
-
-        localStorage.setItem("selectedCategory",value);
-        setSelectedCategory(value);
-        
         // URL 업데이트
         const searchParams = new URLSearchParams(location.search);
         if (value) {
@@ -386,16 +382,105 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
         }
         navigate({ search: searchParams.toString() }, { replace: true });
 
-        const newFilters = createFilters({ category: value });
+        // Load filters for new category
+        const newCat = value || '';
+        const key = (k) => getStorageKey(newCat, k);
+        
+        let newSort = 'asc';
+        let newActor = '';
+        let newOwned = 'all';
+        let newSub = 'all';
+
+        if (newCat) {
+            newSort = localStorage.getItem(key("sortOrder")) || 'asc';
+            newActor = localStorage.getItem(key("actor")) || '';
+            newOwned = localStorage.getItem(key("owned")) || 'all';
+            newSub = localStorage.getItem(key("subscriptExist")) || 'all';
+        }
+
+        setSortOrder(newSort);
+        setSelectedActor(newActor);
+        setOwned(newOwned);
+        setSubscriptExist(newSub);
+        setSelectedCategory(newCat);
+
+        const newFilters = createFilters({ 
+            category: newCat,
+            sortOrder: newSort,
+            actor: newActor,
+            owned: newOwned,
+            subscriptExist: newSub
+        });
         handleFilterChange(newFilters);
     }
 
     const HandleSetSubscriptExist = (value)=>{
-        localStorage.setItem("subscriptExist",value);
+        if (selectedCategory) {
+            localStorage.setItem(getStorageKey(selectedCategory, "subscriptExist"), value);
+        }
         setSubscriptExist(value);
         const newFilters = createFilters({ subscriptExist: value });
         handleFilterChange(newFilters);
     }
+
+    const renderActiveFilters = () => {
+        const filters = [];
+        if (selectedActor) filters.push({ label: `Actor: ${selectedActor}`, onRemove: () => HandleSetSelectedActor('') });
+        if (owned !== 'all') filters.push({ label: `Owned: ${owned}`, onRemove: () => HandleSetOwned('all') });
+        if (subscriptExist !== 'all') filters.push({ label: `Subtitles: ${subscriptExist === 'true' ? 'Yes' : 'No'}`, onRemove: () => HandleSetSubscriptExist('all') });
+        if (sortOrder !== 'asc') filters.push({ label: `Sort: ${sortOrder}`, onRemove: () => HandleSetSortOrder('asc') });
+
+        if (filters.length === 0) return null;
+
+        return (
+            <div className="active-filters" style={{ display: 'flex', gap: '10px', padding: '10px 20px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ color: '#888', fontSize: '0.9em', marginRight: '5px' }}>Active Filters:</span>
+                {filters.map((f, i) => (
+                    <span key={i} style={{ 
+                        background: 'rgba(255, 255, 255, 0.1)', 
+                        padding: '4px 12px', 
+                        borderRadius: '20px', 
+                        fontSize: '0.85em', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#eee'
+                    }}>
+                        {f.label}
+                        <button onClick={f.onRemove} style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            color: '#ff4081', 
+                            cursor: 'pointer', 
+                            fontWeight: 'bold',
+                            fontSize: '1.1em',
+                            padding: '0',
+                            lineHeight: '1',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}>×</button>
+                    </span>
+                ))}
+                <button onClick={() => {
+                    HandleSetSelectedActor('');
+                    HandleSetOwned('all');
+                    HandleSetSubscriptExist('all');
+                    HandleSetSortOrder('asc');
+                }} style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#aaa', 
+                    cursor: 'pointer', 
+                    textDecoration: 'underline', 
+                    fontSize: '0.85em',
+                    marginLeft: '5px'
+                }}>
+                    Clear All
+                </button>
+            </div>
+        );
+    };
 
     const renderOwnedStatus = (movie) => {
         const { plexRegistered, mainMovie, isSeries, episodes } = movie;
@@ -505,6 +590,7 @@ const AMovieList = ({isAuthenticated,isNSFWContentBlured,handleLogout,loginRole,
             onSearchChange={handleSearch}
             totalCount={totalCount}
          />
+        {renderActiveFilters()}
         <div className="movie-list">
             <div className="movies">
                 {movies.map((movie) => (
