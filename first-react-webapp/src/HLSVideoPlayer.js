@@ -230,12 +230,23 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
 
   const renderSubtitles = () => {
     // 로컬 자막 사용 여부 확인 (기본값: false)
-    if (!useLocalSubtitles) return null;
+    if (!useLocalSubtitles) 
+    {
+      console.log("[VideoPlayer] Local subtitles disabled by prop.");
+        return null;
+    }
+     
 
     // AirPlay 활성화 시 로컬 트랙 렌더링 안 함 (HLS 매니페스트 자막 사용)
-    if (isAirPlayActive) return null;
-
-    if (!subSrc || !subSrc.includes(".vtt")) return null;
+    if (isAirPlayActive) 
+      {
+        console.log("[VideoPlayer] AirPlay active - skipping local <track> rendering.");
+        return null;
+      }
+    if (!subSrc || !subSrc.includes(".vtt")) {
+      console.log("[VideoPlayer] No valid local subtitle source provided.");
+      return null;
+    }
     
     // 다국어 자막 지원을 위한 트랙 목록
     // 파일이 실제로 존재하는지 확인하지 않고, 규칙에 따라 URL을 생성하여 태그를 추가합니다.
@@ -247,12 +258,14 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
         { code: 'zh', label: 'Chinese (Local)', suffix: '.zh' }, // 파일명.zh.vtt
     ];
 
+    console.log("[VideoPlayer] Rendering local subtitle <track> tags.");
+
     return languages.map((lang, index) => (
         <track 
             key={`${lang.code}-${subSrc}`} 
             id={`local-sub-${lang.code}`}
             kind="subtitles" 
-            srclang={lang.code} 
+            srcLang={lang.code} 
             label={lang.label} 
             src={subSrc.replace('.vtt', `${lang.suffix}.vtt`)} 
             default={index === 0} 
