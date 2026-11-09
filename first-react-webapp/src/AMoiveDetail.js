@@ -199,7 +199,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     if (!movie) return <div>Loading...</div>;
     
     let availableQualities = [];
-    let currentVideoSrc = '';
+    let currentVideoPath = '';
     let currentSubSrc = '';
 
     if (movie.isSeries && movie.episodes && movie.episodes.length > 0) {
@@ -207,7 +207,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         if (currentEp && currentEp.video) {
             availableQualities = Object.keys(currentEp.video).filter(q => currentEp.video[q]);
             if (selectedQuality && currentEp.video[selectedQuality]) {
-                currentVideoSrc = `${Config.apiUrl}/api/stream?file=${currentEp.video[selectedQuality]}&resolution=${selectedQuality}`;
+                currentVideoPath = currentEp.video[selectedQuality];
             }
             if (currentEp.sub) {
                 currentSubSrc = `${Config.apiUrl}/api/${currentEp.sub}`;
@@ -216,13 +216,17 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     } else if (movie.mainMovie) {
         availableQualities = Object.keys(movie.mainMovie).filter(q => movie.mainMovie[q]);
         if (selectedQuality && movie.mainMovie[selectedQuality]) {
-            currentVideoSrc = `${Config.apiUrl}/api/stream?file=${movie.mainMovie[selectedQuality]}&resolution=${selectedQuality}`;
+            currentVideoPath = movie.mainMovie[selectedQuality];
         }
         if (movie.mainMovieSub) {
             currentSubSrc = `${Config.apiUrl}/api/${movie.mainMovieSub}`;
         }
     }
-   
+    const currentVideoSrc = currentVideoPath ? `${Config.apiUrl}/api/stream?${new URLSearchParams({
+        file: currentVideoPath,
+        resolution: selectedQuality,
+        movieId: movie._id
+    })}` : '';
 
     return (
         <div className="movie-detail">

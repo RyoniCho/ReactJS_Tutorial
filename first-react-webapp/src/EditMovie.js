@@ -120,6 +120,7 @@ function EditMovie() {
         formData.append('releaseDate', movie.releaseDate);
         formData.append('category', movie.category);
         formData.append('mainMovie', JSON.stringify(mainMoviePaths));
+        formData.append('highQualityEncoding', movie.highQualityEncoding === true);
         formData.append('mainMovieSub', movie.mainMovieSub || '');
         formData.append('trailer', movie.trailer);
 
@@ -220,6 +221,19 @@ function EditMovie() {
             <button type="button" onClick={() => setExtraImages(prev => [...prev, { url: '', file: null }])}>추가 이미지 추가</button>
 
             <div style={{marginTop: '20px', marginBottom: '20px'}}>
+                <label style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <input
+                        type="checkbox"
+                        name="highQualityEncoding"
+                        checked={movie.highQualityEncoding === true}
+                        onChange={handleCheckboxChange}
+                        aria-describedby="high-quality-encoding-help"
+                    />
+                    1080p 고화질 인코딩
+                </label>
+                <p id="high-quality-encoding-help">
+                    새로 생성하는 1080p HLS에 Intel Quick Sync 고화질 설정을 적용합니다. 기존 HLS는 그대로 재생됩니다.
+                </p>
                 <div style={{display: 'flex', alignItems: 'center', marginBottom: '10px'}}>
                     <label className="switch" style={{marginRight: '10px', display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
                         <input
