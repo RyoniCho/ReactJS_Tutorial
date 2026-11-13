@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
 import axios from 'axios';
 import Config from './Config';
+import { queueHistorySave, playbackSnapshot } from './playbackHistory';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
 
-function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocalSubtitles = false }) {
+function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocalSubtitles = false, restart = false }) {
   const videoRef = useRef(null);
   const [lastWatchedTime, setLastWatchedTime] = useState(0);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
@@ -62,6 +63,53 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
       return true;
     }
   };
+
+  // Snapshot before the HLS cleanup clears the source; serialize writes per record.
+  useEffect(() => {
+    const video = videoRef.current;
+    const token = localStorage.getItem('accessToken');
+    if (!video || !token || !movieId) return;
+    let played = false;
+    const markPlayed = () => { played = true; };
+    const save = () => {
+      if (!played || localStorage.getItem('accessToken') !== token) return;
+      const data = playbackSnapshot(video, movieId, episodeIndex);
+      if (data) queueHistorySave(token, data);
+    };
+    const hide = () => { if (document.visibilityState === 'hidden') save(); };
+    video.addEventListener('playing', markPlayed);
+    video.addEventListener('pause', save);
+    video.addEventListener('ended', save);
+    document.addEventListener('visibilitychange', hide);
+    const interval = setInterval(() => { if (!video.paused) save(); }, 10000);
+    return () => {
+      save();
+      clearInterval(interval);
+      video.removeEventListener('playing', markPlayed);
+      video.removeEventListener('pause', save);
+      video.removeEventListener('ended', save);
+      document.removeEventListener('visibilitychange', hide);
+    };
+  }, [movieId, episodeIndex, videoSrc]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    const controller = new AbortController();
+    setLastWatchedTime(0);
+    setShowResumePrompt(false);
+    if (token && movieId && !restart) {
+      axios.get(        `${Config.apiUrl}/api/watch-history?movieId=${movieId}&episodeIndex=${episodeIndex}`,
+        { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal }
+      ).then(({ data }) => {
+        if (controller.signal.aborted || localStorage.getItem('accessToken') !== token) return;
+        if (!data.completedAt && data.lastWatchedTime > 0) {
+          setLastWatchedTime(data.lastWatchedTime);
+          setShowResumePrompt(true);
+        }
+      }).catch(() => {});
+    }
+    return () => controller.abort();
+  }, [movieId, episodeIndex, restart]);
 
   // HLS.js 초기화
   useEffect(() => {
@@ -157,43 +205,6 @@ function HLSVideoPlayer({ videoSrc, subSrc, movieId, episodeIndex = -1, useLocal
     };
   }, [videoSrc, movieId, episodeIndex]);
 
-  // 시청 기록 조회
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token || !movieId) return;
-    const fetchWatchHistory = async () => {
-      try {
-        const res = await axios.get(
-          `${Config.apiUrl}/api/watch-history?movieId=${movieId}&episodeIndex=${episodeIndex}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (res.data.lastWatchedTime > 0) {
-          setLastWatchedTime(res.data.lastWatchedTime);
-          setShowResumePrompt(true);
-        }
-      } catch (err) {}
-    };
-    fetchWatchHistory();
-  }, [movieId, episodeIndex]);
-
-  // 일정 간격마다 재생 위치 저장
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (!token || !movieId) return;
-    const interval = setInterval(() => {
-      const video = videoRef.current;
-      if (video && !video.paused) {
-        axios.post(
-          `${Config.apiUrl}/api/watch-history`,
-          { movieId, lastWatchedTime: Math.floor(video.currentTime), episodeIndex },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-    }, 10000); // 10초마다 저장
-    return () => clearInterval(interval);
-  }, [movieId, episodeIndex]);
-
-  // 초를 hh:mm:ss로 변환하는 함수
   const formatTime = (seconds) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);

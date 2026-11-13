@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams,useNavigate } from 'react-router-dom';
+import { useParams,useNavigate,useLocation } from 'react-router-dom';
 import './Styles/AMovieDetail.css'
 import Config from './Config'
 import axios from 'axios';
@@ -9,13 +9,19 @@ import {jwtDecode} from "jwt-decode";
 
 const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     const { id } = useParams();
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
+    const requestedEpisode = Number(query.get('episode') || 0);
+    const restart = query.get('restart') === '1';
     const [movie, setMovie] = useState(null);
     const [loginRole, setLoginRole] = useState(null);
     const navigate = useNavigate();
     const [isFavorite, setIsFavorite] = useState(false);
 
     const [selectedQuality, setSelectedQuality] = useState('');
-    const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0);
+    const currentEpisodeIndex = movie?.isSeries && movie.episodes?.length
+        ? Math.min(Math.max(Number.isInteger(requestedEpisode) ? requestedEpisode : 0, 0), movie.episodes.length - 1) : 0;
+    const setCurrentEpisodeIndex = (index) => navigate({ pathname: location.pathname, search: '?episode=' + index });
     const [useLocalSubtitles, setUseLocalSubtitles] = useState(false);
 
     // availableQualities의 첫 번째 값으로 selectedQuality 자동 설정
@@ -38,6 +44,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
     }, [movie, currentEpisodeIndex]);
 
     useEffect(() => {
+        let active = true;
+        const controller = new AbortController();
 
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
@@ -50,6 +58,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                 const url = `${Config.apiUrl}/api/movies/${id}`;
                 console.log(url)
                 const response = await fetch(url, {
+                signal: controller.signal,
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
                 }
@@ -60,8 +69,9 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                      throw new Error('Failed to fetch movie');
                 }
                 const data = await response.json();
-                setMovie(data);
+                if (active) setMovie(data);
             } catch (error) {
+                if (!active) return;
                 console.error('Error fetching movie:', error);
                 alert('정보를 불러오지 못하였습니다. 홈으로 돌아갑니다.');
                 setMovie(null);
@@ -75,6 +85,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                 const res = await axios.get(`${Config.apiUrl}/api/favorites/ids`, {
                     headers: { Authorization: `Bearer ${accessToken}` }
                 });
+                if (!active) return;
                 if (res.data.includes(id)) {
                     setIsFavorite(true);
                 } else {
@@ -87,6 +98,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
 
         fetchMovie();
         checkFavorite();
+        return () => { active = false; controller.abort(); };
     }, [id]);
 
     const toggleFavorite = async () => {
@@ -196,7 +208,7 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
         document.body.removeChild(link);
     };
 
-    if (!movie) return <div>Loading...</div>;
+    if (!movie || movie._id !== id) return <div>Loading...</div>;
     
     let availableQualities = [];
     let currentVideoPath = '';
@@ -342,6 +354,8 @@ const AMovieDetail = ({isAuthenticated,isNSFWContentBlured}) => {
                     </div>
 
                     <HLSVideoPlayer
+                        key={`${id}:${currentEpisodeIndex}:${location.key}`}
+                        restart={restart}
                         videoSrc={currentVideoSrc}
                         subSrc={currentSubSrc}
                         movieId={id}

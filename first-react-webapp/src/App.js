@@ -247,7 +247,7 @@ function App() {
                 
                 <div className="main-content">
                     <Routes>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={<Home isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} />} />
                         <Route path="/list" element={<AMovieList isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} handleLogout={handleLogout} loginRole={loginRole} logoutTrigger={logoutTrigger} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen}/>} />
                         <Route path="/latest-watched" element={<LatestWatched isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />
                         <Route path="/favorites" element={<Favorites isNSFWContentBlured={isNSFWContentBlured} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} isAuthenticated={isAuthenticated} />} />

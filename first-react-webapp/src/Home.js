@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ServiceHome from './ServiceHome';
 import { useNavigate } from 'react-router-dom';
 import './Styles/Home.css';
 
-const Home = () => {
+const Home = ({ isAuthenticated, isNSFWContentBlured }) => {
+    const [view, setView] = useState(() => {
+        try { return localStorage.getItem('media-home-view') === 'service' ? 'service' : 'cards'; } catch { return 'cards'; }
+    });
+    const selectView = (next) => {
+        setView(next);
+        try { localStorage.setItem('media-home-view', next); } catch {}
+    };
     const navigate = useNavigate();
 
     const handleCategoryClick = (category) => {
@@ -14,7 +22,12 @@ const Home = () => {
     };
 
     return (
-        <div className="home-container">
+        <>
+        <div className="home-view-switch" role="group" aria-label="홈 보기 방식">
+            <button aria-pressed={view === 'cards'} onClick={() => selectView('cards')}>카드 보기</button>
+            <button aria-pressed={view === 'service'} onClick={() => selectView('service')}>서비스 보기</button>
+        </div>
+        {view === 'service' ? <ServiceHome isAuthenticated={isAuthenticated} isNSFWContentBlured={isNSFWContentBlured} /> : <div className="home-container">
             <div className="category-grid">
                 <div className="category-card" onClick={() => handleCategoryClick('ALL')}>
                     <div className="category-content">
@@ -47,7 +60,8 @@ const Home = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>}
+        </>
     );
 };
 

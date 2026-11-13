@@ -303,7 +303,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
                     </div>
 
                     {/* 상단: 선명한 포스터 이미지 (링크 포함) */}
-                    <Link to={`/movies/${h.movieId?._id}`} className="movie-poster-link">
+                    <Link to={`/movies/${h.movieId?._id}?episode=${h.episodeIndex >= 0 ? h.episodeIndex : 0}`} className="movie-poster-link">
                         <div 
                             className="movie-poster-clear"
                             style={{ backgroundImage: `url(${getImageUrl(h.movieId?.image)})` }}
@@ -316,7 +316,7 @@ const LatestWatched = ({ isNSFWContentBlured, isSidebarOpen, setIsSidebarOpen, i
                     {/* 하단: 정보 영역 */}
                     <div className="movie-info-area">
                         <div className="movie-info-bottom">
-                            <Link to={`/movies/${h.movieId?._id}`} className="movie-title-link">
+                            <Link to={`/movies/${h.movieId?._id}?episode=${h.episodeIndex >= 0 ? h.episodeIndex : 0}`} className="movie-title-link">
                                 <h3>{h.movieId?.title}</h3>
                             </Link>
                             <h4>마지막 시청: {formatSeconds(h.lastWatchedTime)}</h4>
