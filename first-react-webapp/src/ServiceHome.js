@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Config from './Config';
+import RecentAdded from './RecentAdded';
 import './Styles/ServiceHome.css';
 
 const categories = [['', '전체 (성인 제외)'], ['Animation', 'Animation'], ['TV Show', 'TV Show'], ['Magic', 'Magic'], ['AdultVideo', 'Adult']];
@@ -69,7 +70,7 @@ export default function ServiceHome({ isAuthenticated, isNSFWContentBlured }) {
     {!current ? <p role="status">영상을 불러오는 중이에요…</p> : current.error ? <div role="alert"><p>{current.error}</p><button onClick={() => setRetry(v => v + 1)}>다시 시도</button></div> :
       <>
         <Shelf title="이어보기" items={current.data.continueWatching} history blur={isNSFWContentBlured} category={category} />
-        <Shelf title="최근 추가된 영상" items={current.data.recentAdded} blur={isNSFWContentBlured} category={category} />
+        <RecentAdded items={current.data.recentAdded} blur={isNSFWContentBlured} category={category} />
         <Shelf title="최근에 본 영상" items={current.data.recentWatched} history blur={isNSFWContentBlured} category={category} />
         <Shelf title="다시 보기" items={current.data.rewatch} history restart blur={isNSFWContentBlured} category={category} />
       </>}

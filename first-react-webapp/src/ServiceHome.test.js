@@ -25,7 +25,7 @@ test('default excludes adult items defensively and logout removes data', async (
   localStorage.setItem('accessToken', 'test');
   axios.get.mockResolvedValue({ data: { ...data, recentAdded: [movie, { ...movie, _id: 'adult', title: 'Hidden film', category: 'AdultVideo' }] } });
   const view = render(wrap(<ServiceHome isAuthenticated isNSFWContentBlured />));
-  await screen.findByText('Visible film');
+  await screen.findAllByText('Visible film');
   expect(screen.queryByText('Hidden film')).toBeNull();
   expect(view.container.querySelector('img').className).toBe('service-blurred');
   view.rerender(wrap(<ServiceHome isAuthenticated={false} />));
@@ -36,7 +36,7 @@ test('category changes clear previous data while request is pending', async () =
   localStorage.setItem('accessToken', 'test');
   axios.get.mockResolvedValueOnce({ data }).mockImplementationOnce(() => new Promise(() => {}));
   render(wrap(<ServiceHome isAuthenticated />));
-  await screen.findByText('Visible film');
+  await screen.findAllByText('Visible film');
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 'TV Show' } });
   expect(screen.queryByText('Visible film')).toBeNull();
   expect(screen.getByRole('status')).toBeTruthy();
@@ -48,5 +48,5 @@ test('failed request offers retry', async () => {
   render(wrap(<ServiceHome isAuthenticated />));
   await screen.findByRole('alert');
   fireEvent.click(screen.getByText('다시 시도'));
-  await screen.findByText('Visible film');
+  await screen.findAllByText('Visible film');
 });
